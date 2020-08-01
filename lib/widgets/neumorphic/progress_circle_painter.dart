@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class ProgressCirclePainter extends CustomPainter {
-  Color filledColor;
+  Color fillColor;
 
   double width;
   double filledPercentage;
@@ -17,7 +17,7 @@ class ProgressCirclePainter extends CustomPainter {
   double embossHeight = 1.0;
 
   ProgressCirclePainter(
-      {this.filledColor = Colors.white,
+      {this.fillColor = Colors.white,
       this.filledPercentage,
       this.thickness,
       this.width,
@@ -57,7 +57,7 @@ class ProgressCirclePainter extends CustomPainter {
       fillArcAngle,
       false,
       Paint()
-        ..color = filledColor
+        ..color = fillColor
         ..strokeWidth = thickness
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round,
@@ -68,7 +68,7 @@ class ProgressCirclePainter extends CustomPainter {
         ..addArc(Rect.fromCircle(center: center, radius: radius), -pi / 2,
             fillArcAngle),
       Paint()
-        ..color = filledColor
+        ..color = fillColor
         ..strokeWidth = thickness / 2
         ..imageFilter = ImageFilter.blur(
           sigmaX: blurSize,

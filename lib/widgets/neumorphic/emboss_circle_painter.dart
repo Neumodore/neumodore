@@ -5,7 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class EmbossCirclePainter extends CustomPainter {
-  Color filledColor;
+  Color backgroundColor;
 
   double width;
   double filledPercentage;
@@ -17,7 +17,7 @@ class EmbossCirclePainter extends CustomPainter {
   double embossHeight = 1.0;
 
   EmbossCirclePainter(
-      {this.filledColor = Colors.white,
+      {this.backgroundColor = Colors.white,
       this.filledPercentage,
       this.thickness,
       this.width,
@@ -58,7 +58,7 @@ class EmbossCirclePainter extends CustomPainter {
       fillArcAngle,
       false,
       Paint()
-        ..color = filledColor
+        ..color = backgroundColor
         ..strokeWidth = thickness
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round,

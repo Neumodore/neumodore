@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:neumorphic/neumorphic.dart';
-import 'screens/home.dart';
+import 'package:neumodore/views/home.dart';
+import 'package:neumodore/views/settings.dart';
 // import 'screens/check.dart';
 // import 'screens/compare.dart';
+import 'package:get/get.dart';
 
 void main() => runApp(NeumorphicApp());
 
@@ -20,16 +21,19 @@ class NeumorphicApp extends StatelessWidget {
       systemNavigationBarColor: _color,
     ));
 
-    return NeuApp(
+    return GetMaterialApp(
       title: 'Neumodore',
-      theme: NeuThemeData(
+      themeMode: ThemeMode.light,
+      theme: ThemeData(
         platform: TargetPlatform.iOS,
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.grey,
+        accentColor: Colors.grey,
+        colorScheme: ColorScheme.light(),
         backgroundColor: Color.lerp(_color, Colors.black, 0.005),
         scaffoldBackgroundColor: _color,
         dialogBackgroundColor: Colors.grey[300],
         appBarTheme: AppBarTheme(
-          brightness: Brightness.dark,
+          brightness: Brightness.light,
           color: _color,
           textTheme: TextTheme(
             headline6: TextStyle(
@@ -43,8 +47,29 @@ class NeumorphicApp extends StatelessWidget {
           ),
         ),
       ),
-      home: ShowcaseScreen(),
+      getPages: [
+        //Simple GetPage
+        GetPage(name: '/home', page: () => HomeScreen()),
+        // GetPage with custom transitions and bindings
+        GetPage(
+            name: '/settings',
+            page: () => SettingsScreen(),
+            transition: Transition.cupertino),
+      ],
+      home: HomeScreen(),
       // home: CheckScreen(), // (predatorx7) Used to test user issues.
     );
   }
+}
+
+class NeumodoreTranslations extends Translations {
+  @override
+  Map<String, Map<String, String>> get keys => {
+        'en': {
+          'title': 'Hello World %s',
+        },
+        'pt_BR': {
+          'title': 'Olá do Brasil',
+        },
+      };
 }
