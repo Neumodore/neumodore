@@ -4,8 +4,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
-import 'package:neumodore/widgets/neumorphic/emboss_circle_painter.dart';
-import 'package:neumodore/widgets/neumorphic/progress_circle_painter.dart';
+
+import 'emboss_circle_painter.dart';
+import 'progress_circle_painter.dart';
 
 class NeuProgressCircle extends StatefulWidget {
   /// Initial value from circle goes from 0.0 to 1.0
@@ -22,9 +23,12 @@ class NeuProgressCircle extends StatefulWidget {
 
   final NeuProgressController controller;
 
+  final Widget child;
+
   NeuProgressCircle({
     this.controller,
     this.initialValue,
+    this.child,
     this.defaultDuration = const Duration(seconds: 1),
     this.backgroundColor = Colors.grey,
     this.initialColor = Colors.greenAccent,
@@ -101,7 +105,8 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
         children: <Widget>[
           CustomPaint(
             child: Center(
-                child: Text('${widget.initialValue.toStringAsFixed(2)}')),
+              child: widget.child,
+            ),
             isComplex: true,
             foregroundPainter: EmbossCirclePainter(
               backgroundColor: widget.backgroundColor,

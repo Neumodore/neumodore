@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:neumodore/clean/data/neumodore_state.dart';
-import 'package:neumodore/clean/presenters/neumodore_presenter.dart';
-import 'package:neumodore/widgets/neumorphic/neumo_circle.dart';
+import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumorphic/neumorphic.dart';
-import 'package:get/get.dart';
 
-class HomeScreen extends StatefulWidget {
+class SettingsScreen extends StatefulWidget {
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _SettingsScreenState createState() => _SettingsScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    implements PomodorePresenterContract {
+class _SettingsScreenState extends State<SettingsScreen> {
   Color backgroundColor = true ? Color(0xFFefeeee) : Color(0xFF1c1f27);
 
   final neuProgressEndColor = Colors.redAccent;
@@ -44,14 +40,7 @@ class _HomeScreenState extends State<HomeScreen>
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                NeuProgressCircle(
-                  initialValue: _progressValue,
-                  backgroundColor: backgroundColor,
-                  defaultDuration: Duration(seconds: 1),
-                  controller: neuProgressController,
-                ),
-              ],
+              children: <Widget>[],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -60,20 +49,20 @@ class _HomeScreenState extends State<HomeScreen>
                   padding: EdgeInsets.only(top: 50),
                   child: NeuButton(
                     onPressed: () async {
-                      updateProgress(0);
+                      updateProgress(.01);
                     },
                     padding: EdgeInsets.all(20),
-                    child: Icon(Icons.remove),
+                    child: Text("- -"),
                   ),
                 ),
                 Container(
                   padding: EdgeInsets.only(top: 50),
                   child: NeuButton(
-                    onPressed: () {
-                      Get.toNamed('settings');
-                    },
+                    onPressed: () {},
                     padding: EdgeInsets.all(20),
-                    child: Icon(Icons.play_arrow),
+                    child: Text(
+                      "${_progressValue.toStringAsFixed(2)}",
+                    ),
                   ),
                 ),
                 Container(
@@ -83,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen>
                       updateProgress(1);
                     },
                     padding: EdgeInsets.all(20),
-                    child: Icon(Icons.add),
+                    child: Text("++"),
                   ),
                 ),
               ],
@@ -97,17 +86,9 @@ class _HomeScreenState extends State<HomeScreen>
   void updateProgress(double newvalue) {
     setState(() {
       _progressValue = newvalue;
-      neuProgressController.animateTo(newvalue);
+      neuProgressController.animateTo(
+        newvalue,
+      );
     });
-  }
-
-  @override
-  void onLoadPresenter(PomodoreState pomodore) {
-    // TODO: implement onLoadPomodore
-  }
-
-  @override
-  void onLoadStateError() {
-    // TODO: implement onLoadPomodoreError
   }
 }

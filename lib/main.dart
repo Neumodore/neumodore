@@ -1,16 +1,15 @@
+import 'package:neumodore/app/features/home/home_page.dart';
+import 'package:neumodore/app/features/settings/settings_page.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:neumodore/views/home.dart';
-import 'package:neumodore/views/settings.dart';
-// import 'screens/check.dart';
-// import 'screens/compare.dart';
 import 'package:get/get.dart';
 
-void main() => runApp(NeumorphicApp());
+void main() => runApp(NeumodoreApp());
 
 Color _color = Color(0xFFf2f2f2); // Colors.grey[200]
 
-class NeumorphicApp extends StatelessWidget {
+class NeumodoreApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
