@@ -1,20 +1,20 @@
 import 'interruption.dart';
 
-class Activity {
+abstract class Activity {
   DateTime startDate;
   DateTime endDate;
   Duration interruptionDuration = Duration.zero;
 
-  final Duration duration;
+  Duration duration;
 
   Activity(this.duration);
 
   Duration get elapsedTime {
     var durationtotal = Duration.zero;
     if (endDate != null) {
-      durationtotal = endDate.difference(startDate);
+      durationtotal = endDate.difference(startDate ?? DateTime.now());
     } else {
-      durationtotal = DateTime.now().difference(startDate);
+      durationtotal = DateTime.now().difference(startDate ?? DateTime.now());
     }
     durationtotal -= interruptionDuration;
     return durationtotal;
@@ -48,9 +48,28 @@ class Activity {
     interruptionDuration = Duration.zero;
   }
 
-  factory Activity.shortBreak() => Activity(Duration(minutes: 5));
+  void increaseDuration(Duration _duration) {
+    this.duration += _duration;
+  }
+}
 
-  factory Activity.onePomodore() => Activity(Duration(minutes: 25));
+class PomodoreActivity extends Activity {
+  PomodoreActivity({Duration duration})
+      : super(
+          duration ?? Duration(minutes: 25),
+        );
+}
 
-  factory Activity.longBreak() => Activity(Duration(minutes: 30));
+class ShortBreakActivity extends Activity {
+  ShortBreakActivity({Duration duration})
+      : super(
+          duration ?? Duration(minutes: 5),
+        );
+}
+
+class LongBreakActivity extends Activity {
+  LongBreakActivity({Duration duration})
+      : super(
+          duration ?? Duration(minutes: 15),
+        );
 }

@@ -1,55 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:neumodore/app/features/home/home_presenter.dart';
-import 'package:neumodore/app/features/home/home_presenter_contract.dart';
+import 'package:get/get.dart';
+import 'package:neumodore/app/features/home/home_page_controller.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_button.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumorphic/neumorphic.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen>
-    implements HomePresenterContract {
-  Color backgroundColor = true ? Color(0xFFefeeee) : Color(0xFF1c1f27);
+class HomeScreen extends StatelessWidget {
+  final Color backgroundColor = true ? Color(0xFFefeeee) : Color(0xFF1c1f27);
   final neuProgressEndColor = Colors.redAccent;
   final neuProgressStartColor = Colors.greenAccent;
 
   final NeuProgressController _neuProgressController = NeuProgressController();
 
-  HomePresenter _presenter;
+  final HomePageController _homePageCtrl = Get.find();
 
-  _HomeScreenState() {
-    _presenter = HomePresenter(this);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _presenter.loadPomodoreState();
-  }
-
-  @override
-  void onLoadState(HomePresenterState pomodore) {
-    _updateProgress(pomodore);
-  }
-
-  @override
-  void onUpdateState(HomePresenterState pomodore) {
-    _updateProgress(pomodore);
-  }
-
-  void _updateProgress(HomePresenterState newvalue) {
-    setState(() {
-      _neuProgressController.animateTo(newvalue.percentageComplete);
-    });
-  }
-
-  @override
-  void onLoadStateError(Error pomod) {
-    // TODO: implement onLoadStateError
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,34 +35,58 @@ class _HomeScreenState extends State<HomeScreen>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            GetBuilder<HomePageController>(
+                builder: (_) => Text(
+                      """Duration
+${_.durationOSD}
+Pomodores: ${_.finishedPomodores}""",
+                      style: Theme.of(context).primaryTextTheme.headline6,
+                      textAlign: TextAlign.center,
+                    )),
+            SizedBox(
+              height: Get.mediaQuery.size.height * 0.05,
+            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 NeuProgressCircle(
-                  child: Text("${_presenter.getState.remainingTime}"),
-                  initialValue: 0.01,
+                  child: GetBuilder<HomePageController>(
+                    builder: (_) {
+                      _neuProgressController.animateTo(_.progressPercentage);
+                      return Text(
+                        '${_.timerOSD}',
+                        style: TextStyle(fontSize: 24),
+                      );
+                    },
+                  ),
+                  initialValue: 0.1,
                   backgroundColor: backgroundColor,
                   defaultDuration: Duration(seconds: 1),
                   controller: _neuProgressController,
                 ),
               ],
             ),
-            _buildControlls(),
+            GetBuilder<HomePageController>(builder: (_) {
+              return _buildControlls(_.currentState);
+            }),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildControlls() {
-    switch (_presenter.getState.activityState) {
-      case ActivityState.PAUSED:
+  Widget _buildControlls(HomePageState state) {
+    switch (state) {
+      case HomePageState.PAUSED:
         return _buildPausedControlls();
         break;
-      case ActivityState.RUNING:
+      case HomePageState.RUNING:
         return _buildPlayingControlls();
         break;
-      case ActivityState.STOPPED:
+      case HomePageState.STOPPED:
+        return _buildStoppedControlls();
+        break;
+      case HomePageState.FINISHED:
         return _buildStoppedControlls();
         break;
     }
@@ -111,25 +99,23 @@ class _HomeScreenState extends State<HomeScreen>
       children: <Widget>[
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeuButton(
-            onPressed: () async {},
+          child: NeumoButton(
+            onPressed: () async {
+              _homePageCtrl.startPomodore();
+            },
             padding: EdgeInsets.all(20),
-            child: Icon(Icons.exposure_plus_1),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.only(top: 50),
-          child: NeuButton(
-            onPressed: () async {},
-            padding: EdgeInsets.all(20),
+            backgroundColor: backgroundColor,
             child: Icon(Icons.play_arrow),
           ),
         ),
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeuButton(
-            onPressed: () async {},
+          child: NeumoButton(
+            onPressed: () async {
+              _homePageCtrl.skipActivity();
+            },
             padding: EdgeInsets.all(20),
+            backgroundColor: backgroundColor,
             child: Icon(Icons.skip_next),
           ),
         ),
@@ -139,12 +125,14 @@ class _HomeScreenState extends State<HomeScreen>
 
   Row _buildPlayingControlls() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
         Container(
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
-            onPressed: () {},
+            onPressed: () {
+              _homePageCtrl.stopPomodore();
+            },
             child: Icon(Icons.stop),
             backgroundColor: backgroundColor,
           ),
@@ -153,7 +141,7 @@ class _HomeScreenState extends State<HomeScreen>
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
             onPressed: () async {
-              _presenter.pausePomodore();
+              _homePageCtrl.pausePomodore();
             },
             padding: EdgeInsets.all(20),
             backgroundColor: backgroundColor,
@@ -163,7 +151,20 @@ class _HomeScreenState extends State<HomeScreen>
         Container(
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
-            onPressed: () async {},
+            onPressed: () async {
+              _homePageCtrl.addOneMinute();
+            },
+            padding: EdgeInsets.all(20),
+            backgroundColor: backgroundColor,
+            child: Icon(Icons.exposure_plus_1),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.only(top: 50),
+          child: NeumoButton(
+            onPressed: () async {
+              _homePageCtrl.skipActivity();
+            },
             padding: EdgeInsets.all(20),
             backgroundColor: backgroundColor,
             child: Icon(Icons.skip_next),
@@ -181,7 +182,7 @@ class _HomeScreenState extends State<HomeScreen>
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
             onPressed: () async {
-              _presenter.resumePomodore();
+              _homePageCtrl.resumePomodore();
             },
             padding: EdgeInsets.all(20),
             backgroundColor: backgroundColor,

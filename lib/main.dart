@@ -1,15 +1,18 @@
 import 'package:neumodore/app/features/home/home_page.dart';
-import 'package:neumodore/app/features/settings/settings_page.dart';
+import 'package:neumodore/app/features/home/home_page_controller.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:neumodore/routes.dart';
 
 void main() => runApp(NeumodoreApp());
 
 Color _color = Color(0xFFf2f2f2); // Colors.grey[200]
 
 class NeumodoreApp extends StatelessWidget {
+  final HomePageController _presenter = Get.put(HomePageController());
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -22,6 +25,7 @@ class NeumodoreApp extends StatelessWidget {
 
     return GetMaterialApp(
       title: 'Neumodore',
+      debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: ThemeData(
         platform: TargetPlatform.iOS,
@@ -46,15 +50,7 @@ class NeumodoreApp extends StatelessWidget {
           ),
         ),
       ),
-      getPages: [
-        //Simple GetPage
-        GetPage(name: '/home', page: () => HomeScreen()),
-        // GetPage with custom transitions and bindings
-        GetPage(
-            name: '/settings',
-            page: () => SettingsScreen(),
-            transition: Transition.cupertino),
-      ],
+      getPages: routes,
       home: HomeScreen(),
       // home: CheckScreen(), // (predatorx7) Used to test user issues.
     );
