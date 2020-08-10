@@ -39,25 +39,32 @@ class HomePageController extends GetxController {
   int get finishedPomodores => state.finishedActivities
       .where((element) => element.runtimeType == PomodoreActivity)
       .length;
+
+  bool allreadyPlayed = false;
   double get progressPercentage {
     if (currentState == HomePageState.FINISHED) {
-      AssetsAudioPlayer.newPlayer().open(
-        Audio("assets/sounds/robinhood76_04864.mp3"),
-        autoStart: true,
-        loopMode: LoopMode.none,
-        volume: 100,
-        showNotification: false,
-        playInBackground: PlayInBackground.enabled,
-        audioFocusStrategy: AudioFocusStrategy.request(
-          resumeOthersPlayersAfterDone: true,
-        ),
-      );
+      if (!allreadyPlayed) {
+        AssetsAudioPlayer.newPlayer().open(
+          Audio("assets/sounds/robinhood76_04864.mp3"),
+          autoStart: true,
+          loopMode: LoopMode.none,
+          volume: 100,
+          showNotification: false,
+          playInBackground: PlayInBackground.enabled,
+          audioFocusStrategy: AudioFocusStrategy.request(
+            resumeOthersPlayersAfterDone: true,
+          ),
+        );
+      }
+      allreadyPlayed = true;
       return 1;
     }
     if (currentState == HomePageState.STOPPED) {
+      allreadyPlayed = false;
       return 1;
     }
 
+    allreadyPlayed = false;
     return state.percentageComplete;
   }
 
