@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/data/activity/activity.dart';
 import 'package:neumodore/data/activity/interruption.dart';
@@ -39,8 +40,24 @@ class HomePageController extends GetxController {
       .where((element) => element.runtimeType == PomodoreActivity)
       .length;
   double get progressPercentage {
-    if (currentState == HomePageState.FINISHED) return 1;
-    if (currentState == HomePageState.STOPPED) return 1;
+    if (currentState == HomePageState.FINISHED) {
+      AssetsAudioPlayer.newPlayer().open(
+        Audio("assets/sounds/robinhood76_04864.mp3"),
+        autoStart: true,
+        loopMode: LoopMode.none,
+        volume: 100,
+        showNotification: false,
+        playInBackground: PlayInBackground.enabled,
+        audioFocusStrategy: AudioFocusStrategy.request(
+          resumeOthersPlayersAfterDone: true,
+        ),
+      );
+      return 1;
+    }
+    if (currentState == HomePageState.STOPPED) {
+      return 1;
+    }
+
     return state.percentageComplete;
   }
 
