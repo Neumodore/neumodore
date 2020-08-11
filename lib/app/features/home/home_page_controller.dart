@@ -4,6 +4,7 @@ import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/data/activity/activity.dart';
 import 'package:neumodore/data/activity/interruption.dart';
+import 'package:wakelock/wakelock.dart';
 
 import 'pomodore_state.dart';
 
@@ -92,6 +93,7 @@ class HomePageController extends GetxController {
 
   void stopPomodore() {
     state.activity.clearInterruptions();
+    Wakelock.disable();
     this.currentState = HomePageState.STOPPED;
     _stopTimer();
   }
@@ -140,6 +142,7 @@ class HomePageController extends GetxController {
   }
 
   void startPomodore() {
+    Wakelock.enable();
     _startPomodore();
   }
 }
