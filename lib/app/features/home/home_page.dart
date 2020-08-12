@@ -59,11 +59,6 @@ Pomodores: ${_.finishedPomodores}""",
                 ),
               ],
             ),
-            NeumoButton(
-                child: Icon(Icons.refresh),
-                onPressed: () {
-                  _homePageCtrl.animateTo(0.5);
-                }),
             GetBuilder<PomodoreController>(builder: (_) {
               return _buildControlls(_.getState());
             }),
@@ -132,7 +127,7 @@ Pomodores: ${_.finishedPomodores}""",
           colors: [
             Colors.redAccent[100],
             Colors.redAccent,
-            Colors.white.withOpacity(0)
+            Get.theme.backgroundColor.withOpacity(0)
           ],
         ),
         borderRadius: BorderRadius.circular(20),
