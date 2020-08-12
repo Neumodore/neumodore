@@ -3,6 +3,6 @@ class Interruption {
   DateTime endDate;
 
   Duration get inDuration {
-    return endDate.difference(startDate);
+    return endDate?.difference(startDate ?? DateTime.now()) ?? Duration.zero;
   }
 }

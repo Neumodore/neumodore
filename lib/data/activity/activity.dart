@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'interruption.dart';
 
 abstract class Activity {
+  String type = 'pomodore';
   DateTime startDate;
   DateTime endDate;
   Duration interruptionDuration = Duration.zero;
@@ -36,6 +39,8 @@ abstract class Activity {
     return (this.elapsedTime.inMilliseconds / duration.inMilliseconds);
   }
 
+  get hasEnded => remainingTime.inMilliseconds <= 0;
+
   void startActivity() {
     this.startDate = DateTime.now();
   }
@@ -51,25 +56,69 @@ abstract class Activity {
   void increaseDuration(Duration _duration) {
     this.duration += _duration;
   }
+
+  Activity fromJson(String json) {
+    final parsed = jsonDecode(json);
+    Activity newActivity = PomodoreActivity();
+    switch (parsed['type']) {
+      case 'pomodore':
+        newActivity = PomodoreActivity(
+          duration: Duration(milliseconds: parsed['duration']),
+        );
+        break;
+      case 'shortbreak':
+        newActivity = ShortBreakActivity(
+          duration: Duration(milliseconds: parsed['duration']),
+        );
+        break;
+      case 'longbreak':
+        newActivity = PomodoreActivity(
+          duration: Duration(milliseconds: parsed['duration']),
+        );
+        break;
+    }
+    return newActivity;
+  }
+
+  String toJson() {
+    return jsonEncode(
+      {
+        'type': this.type,
+        'duration': this.duration.inMilliseconds,
+      },
+    );
+  }
+
+  Activity copyWith({Duration newDuration, String newType}) {
+    this.duration = newDuration ?? this.duration;
+    this.type = newType ?? this.duration;
+    return this;
+  }
 }
 
 class PomodoreActivity extends Activity {
   PomodoreActivity({Duration duration})
       : super(
           duration ?? Duration(minutes: 25),
-        );
+        ) {
+    this.type = 'pomodore';
+  }
 }
 
 class ShortBreakActivity extends Activity {
   ShortBreakActivity({Duration duration})
       : super(
           duration ?? Duration(minutes: 5),
-        );
+        ) {
+    this.type = 'shortbreak';
+  }
 }
 
 class LongBreakActivity extends Activity {
   LongBreakActivity({Duration duration})
       : super(
           duration ?? Duration(minutes: 15),
-        );
+        ) {
+    this.type = 'longbreak';
+  }
 }

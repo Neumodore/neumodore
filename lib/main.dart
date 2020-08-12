@@ -1,5 +1,7 @@
 import 'package:neumodore/app/features/home/home_page.dart';
-import 'package:neumodore/app/features/home/home_page_controller.dart';
+import 'package:neumodore/data/activity/activity.dart';
+import 'package:neumodore/data/pomodore_state.dart';
+import 'package:neumodore/infra/controllers/pomodore_controller.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,7 +13,8 @@ void main() => runApp(NeumodoreApp());
 Color _color = Color(0xFFf2f2f2); // Colors.grey[200]
 
 class NeumodoreApp extends StatelessWidget {
-  final HomePageController _presenter = Get.put(HomePageController());
+  final PomodoreController _presenter =
+      Get.put(PomodoreController(PomodoreState(PomodoreActivity())));
 
   @override
   Widget build(BuildContext context) {

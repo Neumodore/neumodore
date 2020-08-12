@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:neumodore/app/features/home/home_page_controller.dart';
+import 'package:neumodore/infra/controllers/pomodore_controller.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_button.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumorphic/neumorphic.dart';
@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
 
   final NeuProgressController _neuProgressController = NeuProgressController();
 
-  final HomePageController _homePageCtrl = Get.find();
+  final PomodoreController _homePageCtrl = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -35,11 +35,11 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            GetBuilder<HomePageController>(
+            GetBuilder<PomodoreController>(
                 builder: (_) => Text(
                       """Duration
-${_.durationOSD}
-Pomodores: ${_.finishedPomodores}""",
+    ${_.durationOSD}
+    Pomodores: ${_.finishedPomodores}""",
                       style: Theme.of(context).primaryTextTheme.headline6,
                       textAlign: TextAlign.center,
                     )),
@@ -50,9 +50,11 @@ Pomodores: ${_.finishedPomodores}""",
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 NeuProgressCircle(
-                  child: GetBuilder<HomePageController>(
+                  child: GetBuilder<PomodoreController>(
                     builder: (_) {
-                      _neuProgressController.animateTo(_.progressPercentage);
+                      _neuProgressController.animateTo(
+                        _.progressPercentage,
+                      );
                       return Text(
                         '${_.timerOSD}',
                         style: TextStyle(fontSize: 24),
@@ -62,31 +64,67 @@ Pomodores: ${_.finishedPomodores}""",
                   initialValue: 0.1,
                   backgroundColor: backgroundColor,
                   defaultDuration: Duration(seconds: 1),
+                  defaultCurve: Curves.easeOutQuart,
                   controller: _neuProgressController,
                 ),
               ],
             ),
-            GetBuilder<HomePageController>(builder: (_) {
-              return _buildControlls(_.currentState);
+            GetBuilder<PomodoreController>(builder: (_) {
+              return _buildControlls(_.getState());
             }),
+            Padding(
+              padding: const EdgeInsets.only(top: 30.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      height: 50,
+                      child: GetBuilder<PomodoreController>(builder: (_) {
+                        List<Widget> dots = [];
+                        for (var i = 0; i < _.finishedPomodores; i++) {
+                          dots.add(_buildDot());
+                        }
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: dots,
+                        );
+                      }),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildControlls(HomePageState state) {
+  Container _buildDot() {
+    return Container(
+      width: 30,
+      height: 30,
+      decoration: BoxDecoration(
+        gradient: RadialGradient(
+          colors: [Colors.redAccent[100], Colors.redAccent, Colors.white],
+        ),
+        borderRadius: BorderRadius.circular(20),
+      ),
+    );
+  }
+
+  Widget _buildControlls(ControllerState state) {
     switch (state) {
-      case HomePageState.PAUSED:
+      case ControllerState.PAUSED:
         return _buildPausedControlls();
         break;
-      case HomePageState.RUNING:
+      case ControllerState.RUNING:
         return _buildPlayingControlls();
         break;
-      case HomePageState.STOPPED:
+      case ControllerState.STOPPED:
         return _buildStoppedControlls();
         break;
-      case HomePageState.FINISHED:
+      case ControllerState.COMPLETED:
         return _buildStoppedControlls();
         break;
     }
@@ -95,7 +133,7 @@ Pomodores: ${_.finishedPomodores}""",
 
   Row _buildStoppedControlls() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
         Container(
           padding: EdgeInsets.only(top: 50),
@@ -176,8 +214,18 @@ Pomodores: ${_.finishedPomodores}""",
 
   Row _buildPausedControlls() {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
+        Container(
+          padding: EdgeInsets.only(top: 50),
+          child: NeumoButton(
+            onPressed: () {
+              _homePageCtrl.stopPomodore();
+            },
+            child: Icon(Icons.stop),
+            backgroundColor: backgroundColor,
+          ),
+        ),
         Container(
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
@@ -187,6 +235,28 @@ Pomodores: ${_.finishedPomodores}""",
             padding: EdgeInsets.all(20),
             backgroundColor: backgroundColor,
             child: Icon(Icons.play_arrow),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.only(top: 50),
+          child: NeumoButton(
+            onPressed: () async {
+              _homePageCtrl.addOneMinute();
+            },
+            padding: EdgeInsets.all(20),
+            backgroundColor: backgroundColor,
+            child: Icon(Icons.exposure_plus_1),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.only(top: 50),
+          child: NeumoButton(
+            onPressed: () async {
+              _homePageCtrl.skipActivity();
+            },
+            padding: EdgeInsets.all(20),
+            backgroundColor: backgroundColor,
+            child: Icon(Icons.skip_next),
           ),
         ),
       ],

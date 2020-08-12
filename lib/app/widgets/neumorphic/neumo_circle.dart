@@ -14,6 +14,7 @@ class NeuProgressCircle extends StatefulWidget {
 
   /// Default animation duration
   final Duration defaultDuration;
+  final Curve defaultCurve;
 
   final Color backgroundColor;
   final Color finalColor;
@@ -29,6 +30,7 @@ class NeuProgressCircle extends StatefulWidget {
     this.controller,
     this.initialValue,
     this.child,
+    this.defaultCurve = Curves.fastOutSlowIn,
     this.defaultDuration = const Duration(seconds: 1),
     this.backgroundColor = Colors.grey,
     this.initialColor = Colors.greenAccent,
@@ -89,7 +91,7 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
     setState(() {
       fillController.animateTo(
         value.value,
-        curve: value.curve ?? Curves.easeOutQuint,
+        curve: value.curve ?? widget.defaultCurve,
         duration: value.duration ?? widget.defaultDuration,
       );
     });
@@ -151,7 +153,7 @@ class ProgressRequest {
   final Duration duration;
 
   ProgressRequest({
-    this.value = 0,
+    this.value = 0.0,
     this.curve,
     this.duration,
   });
