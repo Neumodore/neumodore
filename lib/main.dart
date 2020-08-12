@@ -27,7 +27,6 @@ class NeumodoreApp extends StatelessWidget {
       getPages: routes,
       initialRoute: '/home',
       themeMode: ThemeMode.system,
-      theme: NeumodoreThemes.light(),
       // home: CheckScreen(), // (predatorx7) Used to test user issues.
     );
   }

@@ -27,6 +27,7 @@ class NeuProgressCircle extends StatefulWidget {
   final Widget child;
 
   NeuProgressCircle({
+    Key key,
     this.controller,
     this.initialValue,
     this.child,
@@ -35,7 +36,7 @@ class NeuProgressCircle extends StatefulWidget {
     this.initialColor = Colors.greenAccent,
     this.finalColor = Colors.redAccent,
     this.backgroundColor,
-  });
+  }) : super(key: key);
 
   @override
   _NeuProgressCircleState createState() => _NeuProgressCircleState();
@@ -44,6 +45,7 @@ class NeuProgressCircle extends StatefulWidget {
 class _NeuProgressCircleState extends State<NeuProgressCircle>
     with SingleTickerProviderStateMixin {
   double _currPercent = 0.0;
+
   Color _currColor;
   AnimationController fillController;
 
@@ -88,13 +90,12 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
   }
 
   void animateTo(ProgressRequest value) {
-    setState(() {
-      fillController.animateTo(
-        value.value,
-        curve: value.curve ?? widget.defaultCurve,
-        duration: value.duration ?? widget.defaultDuration,
-      );
-    });
+    fillController.animateTo(
+      value.value,
+      curve: value.curve ?? widget.defaultCurve,
+      duration: value.duration ?? widget.defaultDuration,
+    );
+    setState(() {});
   }
 
   @override
@@ -110,9 +111,9 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
               child: widget.child,
             ),
             foregroundPainter: EmbossCirclePainter(
+              _currPercent,
               backgroundColor:
                   widget.backgroundColor ?? Theme.of(context).backgroundColor,
-              filledPercentage: 100,
               thickness: 20,
               width: 20,
               embossHeight: widget.embossHeight,

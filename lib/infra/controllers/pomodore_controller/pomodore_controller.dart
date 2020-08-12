@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:get/get.dart';
+import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumodore/infra/managers/pomodore_manager/pomodore_manager.dart';
 import 'package:neumodore/infra/persistence/ipersistence_adapter.dart';
 import 'package:wakelock/wakelock.dart';
@@ -9,6 +10,8 @@ import 'package:wakelock/wakelock.dart';
 enum ControllerState { PAUSED, RUNING, STOPPED, COMPLETED }
 
 class PomodoreController extends GetxController {
+  final NeuProgressController neuProgressController = NeuProgressController();
+
   PomodoreController(
     IPersistenceAdapter persistenceAdapter,
   ) {
@@ -25,6 +28,7 @@ class PomodoreController extends GetxController {
     }
 
     if (stateManager.percentageComplete != lastPercentageUpdate) {
+      neuProgressController.animateTo(stateManager.percentageComplete);
       print('Runing');
       print(this.stateManager.percentageComplete);
       print(this.getState().toString());
@@ -129,5 +133,9 @@ class PomodoreController extends GetxController {
         ),
       )
       ..forwardOrRewind(1);
+  }
+
+  void animateTo(double d) {
+    neuProgressController.animateTo(d);
   }
 }

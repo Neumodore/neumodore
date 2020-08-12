@@ -9,8 +9,6 @@ class HomeScreen extends StatelessWidget {
   final neuProgressEndColor = Colors.redAccent;
   final neuProgressStartColor = Colors.greenAccent;
 
-  final NeuProgressController _neuProgressController = NeuProgressController();
-
   final PomodoreController _homePageCtrl = Get.find();
 
   @override
@@ -40,35 +38,32 @@ Pomodores: ${_.finishedPomodores}""",
             SizedBox(
               height: Get.mediaQuery.size.height * 0.05,
             ),
-            GetBuilder<PomodoreController>(
-              builder: (_) {
-                _neuProgressController.animateTo(
-                  _.progressPercentage,
-                );
-
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    NeuProgressCircle(
-                      child: GetBuilder<PomodoreController>(
-                        builder: (_) {
-                          print('Animated to');
-                          print(_.progressPercentage);
-                          return Text(
-                            '${_.timerOSD}',
-                            style: TextStyle(fontSize: 24),
-                          );
-                        },
-                      ),
-                      initialValue: 0.1,
-                      defaultDuration: Duration(seconds: 1),
-                      defaultCurve: Curves.easeOutQuart,
-                      controller: _neuProgressController,
-                    ),
-                  ],
-                );
-              },
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                NeuProgressCircle(
+                  child: GetBuilder<PomodoreController>(
+                    builder: (_) {
+                      return Text(
+                        '${_.timerOSD}',
+                        style: TextStyle(
+                          fontSize: 24,
+                        ),
+                      );
+                    },
+                  ),
+                  initialValue: 0.01,
+                  defaultDuration: Duration(seconds: 4),
+                  defaultCurve: Curves.easeOutQuart,
+                  controller: _homePageCtrl.neuProgressController,
+                ),
+              ],
             ),
+            NeumoButton(
+                child: Icon(Icons.refresh),
+                onPressed: () {
+                  _homePageCtrl.animateTo(0.5);
+                }),
             GetBuilder<PomodoreController>(builder: (_) {
               return _buildControlls(_.getState());
             }),

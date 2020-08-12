@@ -5,23 +5,24 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class EmbossCirclePainter extends CustomPainter {
+  double currentPercentage;
+
   Color backgroundColor;
-
   double width;
-  double filledPercentage;
-
   double thickness;
-
-  bool onlyFill;
-
   double embossHeight = 1.0;
 
+  Paint fillPaint = Paint();
+  Paint lightPaint = Paint();
+  Paint shadowPaint = Paint();
+
   EmbossCirclePainter(
-      {this.backgroundColor = Colors.white,
-      this.filledPercentage,
-      this.thickness,
-      this.width,
-      this.embossHeight = 1.0});
+    this.currentPercentage, {
+    this.backgroundColor = Colors.white,
+    this.thickness,
+    this.width,
+    this.embossHeight = 1.0,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -31,7 +32,7 @@ class EmbossCirclePainter extends CustomPainter {
 
     double radius = min(size.width / 2, size.height / 2);
 
-    double fillArcAngle = 2 * pi * (filledPercentage / 100);
+    double fillArcAngle = 2 * pi * (currentPercentage / 100);
     double translate = 13 * embossHeight;
     buildLight(
       canvas,
@@ -57,7 +58,7 @@ class EmbossCirclePainter extends CustomPainter {
       -pi / 2,
       fillArcAngle,
       false,
-      Paint()
+      fillPaint
         ..color = backgroundColor
         ..strokeWidth = thickness
         ..style = PaintingStyle.stroke
@@ -72,7 +73,7 @@ class EmbossCirclePainter extends CustomPainter {
       -pi / 2,
       fillArcAngle,
       false,
-      Paint()
+      lightPaint
         ..color = Colors.grey[700]
         ..strokeWidth = thickness * 5 / (radius)
         ..style = PaintingStyle.stroke
@@ -94,8 +95,8 @@ class EmbossCirclePainter extends CustomPainter {
       -pi / 2,
       fillArcAngle,
       false,
-      Paint()
-        ..color = Colors.grey[700]
+      shadowPaint
+        ..color = Colors.black87
         ..strokeWidth = thickness * 10 / (radius)
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
@@ -105,7 +106,6 @@ class EmbossCirclePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    return true;
-  }
+  bool shouldRepaint(EmbossCirclePainter oldDelegate) =>
+      oldDelegate.currentPercentage != this.currentPercentage;
 }

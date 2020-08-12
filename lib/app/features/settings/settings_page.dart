@@ -41,18 +41,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Text("Switch theme"),
                 NeuSwitch(
                   backgroundColor: Get.theme.backgroundColor,
-                  groupValue: currentTheme,
+                  groupValue: Get.isDarkMode,
                   children: {
-                    'dark': Icon(Icons.brightness_5),
-                    'light': Icon(Icons.brightness_7)
+                    false: Icon(Icons.brightness_5),
+                    true: Icon(Icons.brightness_7)
                   },
                   onValueChanged: (val) {
-                    val == 'dark'
+                    val
                         ? Get.changeTheme(NeumodoreThemes.dark())
                         : Get.changeTheme(NeumodoreThemes.light());
-                    setState(() {
-                      currentTheme = val;
-                    });
                   },
                 )
               ],
