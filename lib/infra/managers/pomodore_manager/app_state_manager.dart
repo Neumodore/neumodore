@@ -1,7 +1,7 @@
 import 'package:neumodore/data/app_config/app_config.dart';
 import 'package:neumodore/data/pomodore_state.dart';
 
-import '../persistence/ipersistence_adapter.dart';
+import '../../persistence/ipersistence_adapter.dart';
 
 class AppStateManager {
   AppConfig _configuration;

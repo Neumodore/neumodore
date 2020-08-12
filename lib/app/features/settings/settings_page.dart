@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
+import 'package:neumodore/themes.dart';
 import 'package:neumorphic/neumorphic.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -8,19 +10,14 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  Color backgroundColor = true ? Color(0xFFefeeee) : Color(0xFF1c1f27);
-
-  final neuProgressEndColor = Colors.redAccent;
-  final neuProgressStartColor = Colors.greenAccent;
-
   final NeuProgressController neuProgressController = NeuProgressController();
 
-  double _progressValue = 0.30;
+  String currentTheme = 'light';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Get.theme.backgroundColor,
       appBar: AppBar(
         title: Text(
           'Neumodore',
@@ -36,59 +33,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[],
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Text("Switch theme"),
+                NeuSwitch(
+                  backgroundColor: Get.theme.backgroundColor,
+                  groupValue: currentTheme,
+                  children: {
+                    'dark': Icon(Icons.brightness_5),
+                    'light': Icon(Icons.brightness_7)
+                  },
+                  onValueChanged: (val) {
+                    val == 'dark'
+                        ? Get.changeTheme(NeumodoreThemes.dark())
+                        : Get.changeTheme(NeumodoreThemes.light());
+                    setState(() {
+                      currentTheme = val;
+                    });
+                  },
+                )
+              ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.only(top: 50),
-                  child: NeuButton(
-                    onPressed: () async {
-                      updateProgress(.01);
-                    },
-                    padding: EdgeInsets.all(20),
-                    child: Text("- -"),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: 50),
-                  child: NeuButton(
-                    onPressed: () {},
-                    padding: EdgeInsets.all(20),
-                    child: Text(
-                      "${_progressValue.toStringAsFixed(2)}",
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: 50),
-                  child: NeuButton(
-                    onPressed: () async {
-                      updateProgress(1);
-                    },
-                    padding: EdgeInsets.all(20),
-                    child: Text("++"),
-                  ),
-                ),
-              ],
+              children: <Widget>[],
             ),
           ],
         ),
       ),
     );
-  }
-
-  void updateProgress(double newvalue) {
-    setState(() {
-      _progressValue = newvalue;
-      neuProgressController.animateTo(
-        newvalue,
-      );
-    });
   }
 }

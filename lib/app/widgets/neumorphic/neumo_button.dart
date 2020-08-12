@@ -20,9 +20,9 @@ class NeumoButton extends StatelessWidget {
     return NeuButton(
       onPressed: onPressed,
       padding: padding ?? EdgeInsets.all(20),
-      child: child ?? SizedBox(),
+      child: child,
       decoration: NeumorphicDecoration(
-        color: backgroundColor ?? Colors.white,
+        color: backgroundColor ?? Theme.of(context).backgroundColor,
         shape: BoxShape.rectangle,
         borderRadius: BorderRadius.circular(10),
       ),

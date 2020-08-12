@@ -2,7 +2,8 @@ import 'package:neumodore/data/activity/activity.dart';
 
 abstract class IPomodoreState {
   List<Activity> get finishedPomodores;
-  List<Activity> get finishedBreaks;
+  List<Activity> get finishedShortBreaks;
+  List<Activity> get finishedLongBreaks;
 
   Activity currentActivity;
   List<Activity> finishedActivities = List<Activity>();
@@ -23,13 +24,25 @@ class PomodoreState implements IPomodoreState {
   });
 
   @override
-  List<Activity> finishedActivities = List<Activity>();
+  List<Activity> finishedActivities = <Activity>[];
 
   @override
-  List<Activity> get finishedBreaks => finishedActivities
-      .where((element) => element.runtimeType == ShortBreakActivity);
+  List<Activity> get finishedPomodores =>
+      finishedActivities
+          ?.where((element) => element.runtimeType == PomodoreActivity)
+          ?.toList() ??
+      List<Activity>();
 
   @override
-  List<Activity> get finishedPomodores => finishedActivities
-      .where((element) => element.runtimeType == PomodoreActivity);
+  List<Activity> get finishedShortBreaks =>
+      finishedActivities
+          ?.where((element) => element.runtimeType == ShortBreakActivity)
+          ?.toList() ??
+      List<Activity>();
+
+  List<Activity> get finishedLongBreaks =>
+      finishedActivities
+          ?.where((element) => element.runtimeType == LongBreakActivity)
+          ?.toList() ??
+      List<Activity>();
 }

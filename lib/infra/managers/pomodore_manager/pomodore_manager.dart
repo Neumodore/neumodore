@@ -1,22 +1,30 @@
 import 'package:neumodore/data/activity/activity.dart';
-import 'package:neumodore/data/activity/interruption.dart';
+import 'package:neumodore/data/interruption.dart';
 import 'package:neumodore/data/pomodore_state.dart';
 import 'package:neumodore/infra/persistence/ipersistence_adapter.dart';
 
 class PomodoreManager {
-  IPersistenceAdapter persistenceAdapter;
+  IPersistenceAdapter _persistenceAdapter;
   PomodoreState _pomodoreState = PomodoreState(PomodoreActivity());
 
   DateTime _interruptionStartAt;
 
   DateTime _interruptionEndAt;
 
-  PomodoreManager(this.persistenceAdapter) {
-    persistenceAdapter.loadState().then((value) {
+  PomodoreManager(this._persistenceAdapter) {
+    _persistenceAdapter.loadState().then((value) {
       _pomodoreState = value;
     });
   }
+
   List<Activity> get finishedActivities => _pomodoreState.finishedActivities;
+
+  List<Activity> get finishedPomodores => _pomodoreState.finishedPomodores;
+
+  List<Activity> get finishedShortBreaks => _pomodoreState.finishedShortBreaks;
+
+  List<Activity> get finishedLongBreaks => _pomodoreState.finishedLongBreaks;
+
   Activity get currentActivitiy => _pomodoreState.currentActivity;
 
   void changeActivity(_activity) {
@@ -85,5 +93,9 @@ class PomodoreManager {
     currentActivitiy.addInterruption(Interruption()
       ..startDate = _interruptionStartAt
       ..endDate = _interruptionEndAt);
+  }
+
+  void hasStateChange() {
+    _persistenceAdapter.saveState(this._pomodoreState);
   }
 }

@@ -1,12 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:neumodore/infra/controllers/pomodore_controller.dart';
+import 'package:neumodore/infra/controllers/pomodore_controller/pomodore_controller.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_button.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
-import 'package:neumorphic/neumorphic.dart';
 
 class HomeScreen extends StatelessWidget {
-  final Color backgroundColor = true ? Color(0xFFefeeee) : Color(0xFF1c1f27);
   final neuProgressEndColor = Colors.redAccent;
   final neuProgressStartColor = Colors.greenAccent;
 
@@ -17,19 +16,15 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
-      appBar: AppBar(
-        title: Text(
-          'Neumodore',
-          style: Theme.of(context)
-              .textTheme
-              .headline6
-              .copyWith(color: Colors.black),
+      backgroundColor: Get.theme.backgroundColor,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: AppBar(
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          primary: true,
+          flexibleSpace: _buildTopBar(context),
         ),
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        brightness: Brightness.light,
-        centerTitle: true,
       ),
       body: Center(
         child: Column(
@@ -38,36 +33,41 @@ class HomeScreen extends StatelessWidget {
             GetBuilder<PomodoreController>(
                 builder: (_) => Text(
                       """Duration
-    ${_.durationOSD}
-    Pomodores: ${_.finishedPomodores}""",
-                      style: Theme.of(context).primaryTextTheme.headline6,
+${_.durationOSD}
+Pomodores: ${_.finishedPomodores}""",
                       textAlign: TextAlign.center,
                     )),
             SizedBox(
               height: Get.mediaQuery.size.height * 0.05,
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                NeuProgressCircle(
-                  child: GetBuilder<PomodoreController>(
-                    builder: (_) {
-                      _neuProgressController.animateTo(
-                        _.progressPercentage,
-                      );
-                      return Text(
-                        '${_.timerOSD}',
-                        style: TextStyle(fontSize: 24),
-                      );
-                    },
-                  ),
-                  initialValue: 0.1,
-                  backgroundColor: backgroundColor,
-                  defaultDuration: Duration(seconds: 1),
-                  defaultCurve: Curves.easeOutQuart,
-                  controller: _neuProgressController,
-                ),
-              ],
+            GetBuilder<PomodoreController>(
+              builder: (_) {
+                _neuProgressController.animateTo(
+                  _.progressPercentage,
+                );
+
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    NeuProgressCircle(
+                      child: GetBuilder<PomodoreController>(
+                        builder: (_) {
+                          print('Animated to');
+                          print(_.progressPercentage);
+                          return Text(
+                            '${_.timerOSD}',
+                            style: TextStyle(fontSize: 24),
+                          );
+                        },
+                      ),
+                      initialValue: 0.1,
+                      defaultDuration: Duration(seconds: 1),
+                      defaultCurve: Curves.easeOutQuart,
+                      controller: _neuProgressController,
+                    ),
+                  ],
+                );
+              },
             ),
             GetBuilder<PomodoreController>(builder: (_) {
               return _buildControlls(_.getState());
@@ -81,8 +81,10 @@ class HomeScreen extends StatelessWidget {
                       height: 50,
                       child: GetBuilder<PomodoreController>(builder: (_) {
                         List<Widget> dots = [];
-                        for (var i = 0; i < _.finishedPomodores; i++) {
-                          dots.add(_buildDot());
+                        if (_.finishedPomodores > 0) {
+                          for (var i = 0; i < _.finishedPomodores; i++) {
+                            dots.add(_buildDot());
+                          }
                         }
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -100,13 +102,43 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildTopBar(BuildContext context) {
+    return SafeArea(
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Text(
+              'Neumodore',
+              style:
+                  Theme.of(context).textTheme.headline6.copyWith(fontSize: 34),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: NeumoButton(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                child: Icon(Icons.settings),
+                onPressed: () => Get.toNamed('settings'),
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   Container _buildDot() {
     return Container(
       width: 30,
       height: 30,
       decoration: BoxDecoration(
         gradient: RadialGradient(
-          colors: [Colors.redAccent[100], Colors.redAccent, Colors.white],
+          colors: [
+            Colors.redAccent[100],
+            Colors.redAccent,
+            Colors.white.withOpacity(0)
+          ],
         ),
         borderRadius: BorderRadius.circular(20),
       ),
@@ -142,7 +174,6 @@ class HomeScreen extends StatelessWidget {
               _homePageCtrl.startPomodore();
             },
             padding: EdgeInsets.all(20),
-            backgroundColor: backgroundColor,
             child: Icon(Icons.play_arrow),
           ),
         ),
@@ -153,7 +184,6 @@ class HomeScreen extends StatelessWidget {
               _homePageCtrl.skipActivity();
             },
             padding: EdgeInsets.all(20),
-            backgroundColor: backgroundColor,
             child: Icon(Icons.skip_next),
           ),
         ),
@@ -172,7 +202,6 @@ class HomeScreen extends StatelessWidget {
               _homePageCtrl.stopPomodore();
             },
             child: Icon(Icons.stop),
-            backgroundColor: backgroundColor,
           ),
         ),
         Container(
@@ -182,7 +211,6 @@ class HomeScreen extends StatelessWidget {
               _homePageCtrl.pausePomodore();
             },
             padding: EdgeInsets.all(20),
-            backgroundColor: backgroundColor,
             child: Icon(Icons.pause),
           ),
         ),
@@ -193,7 +221,6 @@ class HomeScreen extends StatelessWidget {
               _homePageCtrl.addOneMinute();
             },
             padding: EdgeInsets.all(20),
-            backgroundColor: backgroundColor,
             child: Icon(Icons.exposure_plus_1),
           ),
         ),
@@ -204,7 +231,6 @@ class HomeScreen extends StatelessWidget {
               _homePageCtrl.skipActivity();
             },
             padding: EdgeInsets.all(20),
-            backgroundColor: backgroundColor,
             child: Icon(Icons.skip_next),
           ),
         ),
@@ -223,7 +249,6 @@ class HomeScreen extends StatelessWidget {
               _homePageCtrl.stopPomodore();
             },
             child: Icon(Icons.stop),
-            backgroundColor: backgroundColor,
           ),
         ),
         Container(
@@ -233,7 +258,6 @@ class HomeScreen extends StatelessWidget {
               _homePageCtrl.resumePomodore();
             },
             padding: EdgeInsets.all(20),
-            backgroundColor: backgroundColor,
             child: Icon(Icons.play_arrow),
           ),
         ),
@@ -244,7 +268,6 @@ class HomeScreen extends StatelessWidget {
               _homePageCtrl.addOneMinute();
             },
             padding: EdgeInsets.all(20),
-            backgroundColor: backgroundColor,
             child: Icon(Icons.exposure_plus_1),
           ),
         ),
@@ -255,7 +278,6 @@ class HomeScreen extends StatelessWidget {
               _homePageCtrl.skipActivity();
             },
             padding: EdgeInsets.all(20),
-            backgroundColor: backgroundColor,
             child: Icon(Icons.skip_next),
           ),
         ),

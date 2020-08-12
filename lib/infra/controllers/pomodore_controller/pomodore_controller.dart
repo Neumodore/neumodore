@@ -2,35 +2,35 @@ import 'dart:async';
 
 import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:get/get.dart';
-import 'package:neumodore/data/activity/activity.dart';
-import 'package:neumodore/data/activity/interruption.dart';
-import 'package:neumodore/data/pomodore_state.dart';
-import 'package:neumodore/infra/persistence/sharedprefs_persistence.dart';
+import 'package:neumodore/infra/managers/pomodore_manager/pomodore_manager.dart';
+import 'package:neumodore/infra/persistence/ipersistence_adapter.dart';
 import 'package:wakelock/wakelock.dart';
-
-import 'pomodore_manager/pomodore_manager.dart';
 
 enum ControllerState { PAUSED, RUNING, STOPPED, COMPLETED }
 
 class PomodoreController extends GetxController {
-  PomodoreController(PomodoreState pomodoreState) {
-    stateManager = PomodoreManager(
-      SharedPrefsPersistence(),
-    );
+  PomodoreController(
+    IPersistenceAdapter persistenceAdapter,
+  ) {
+    stateManager = PomodoreManager(persistenceAdapter);
 
-    _timerUpdater = new Timer.periodic(Duration(milliseconds: 500), (var tim) {
-      print('Remaining');
+    _timerUpdater = Timer.periodic(Duration(milliseconds: 500), _onTimerUpdate);
+  }
+
+  double lastPercentageUpdate = 0.0;
+  void _onTimerUpdate(var tim) {
+    if (getState() == ControllerState.RUNING &&
+        stateManager.percentageComplete >= 1) {
+      changeState(ControllerState.COMPLETED);
+    }
+
+    if (stateManager.percentageComplete != lastPercentageUpdate) {
+      print('Runing');
       print(this.stateManager.percentageComplete);
       print(this.getState().toString());
-
-      if (getState() == ControllerState.RUNING &&
-          stateManager.percentageComplete >= 1) {
-        changeState(ControllerState.COMPLETED);
-      }
-      if (getState() == ControllerState.RUNING) {
-        update();
-      }
-    });
+      lastPercentageUpdate = stateManager.percentageComplete;
+      update();
+    }
   }
 
   Timer _timerUpdater;
@@ -46,20 +46,9 @@ class PomodoreController extends GetxController {
   void changeState(ControllerState nextState) {
     if (nextState == ControllerState.COMPLETED &&
         _currentState == ControllerState.RUNING) {
-      if (!allreadyPlayed) {
-        AssetsAudioPlayer.newPlayer().open(
-          Audio('assets/sounds/robinhood76_04864.mp3'),
-          autoStart: true,
-          loopMode: LoopMode.none,
-          volume: 100,
-          showNotification: false,
-          playInBackground: PlayInBackground.enabled,
-          audioFocusStrategy:
-              AudioFocusStrategy.request(resumeOthersPlayersAfterDone: true),
-        );
-        allreadyPlayed = true;
-      }
+      _playMusic();
     }
+
     _currentState = nextState;
     update();
   }
@@ -69,7 +58,7 @@ class PomodoreController extends GetxController {
 
   String get timerOSD => stateManager.remainingTime;
 
-  int get finishedPomodores => stateManager.finishedActivities.length;
+  int get finishedPomodores => stateManager?.finishedPomodores?.length ?? 0;
 
   bool allreadyPlayed = false;
   double get progressPercentage {
@@ -125,5 +114,20 @@ class PomodoreController extends GetxController {
     stateManager.startActivity();
     _startTimer();
     update();
+  }
+
+  void _playMusic() {
+    AssetsAudioPlayer.newPlayer()
+      ..setVolume(1)
+      ..open(
+        Audio('assets/sounds/robinhood76_04864.mp3'),
+        loopMode: LoopMode.none,
+        showNotification: true,
+        playInBackground: PlayInBackground.enabled,
+        audioFocusStrategy: AudioFocusStrategy.request(
+          resumeAfterInterruption: true,
+        ),
+      )
+      ..forwardOrRewind(1);
   }
 }

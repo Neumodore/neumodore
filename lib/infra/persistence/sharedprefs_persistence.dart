@@ -23,12 +23,15 @@ class SharedPrefsPersistence implements IPersistenceAdapter {
 
   @override
   void saveConfig(AppConfig state) async {
-    await (await sharedInstance).setString(CONFIG_KEY, state.toJson());
+    print({'SAVE CONFIG': state.pomodoreDuration});
+    // await (await sharedInstance).setString(CONFIG_KEY, state.toJson());
   }
 
   @override
   Future<PomodoreState> loadState({PomodoreState standardValue}) async {
     // TODO: implement loadState
+    print({'LOADED STATE'});
+
     return PomodoreState(PomodoreActivity(), finishedActivities: []);
   }
 

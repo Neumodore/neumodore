@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'interruption.dart';
+import 'package:neumodore/data/interruption.dart';
 
 abstract class Activity {
   String type = 'pomodore';
@@ -36,7 +36,9 @@ abstract class Activity {
   }
 
   double get percentageComplete {
-    return (this.elapsedTime.inMilliseconds / duration.inMilliseconds);
+    final percentageCalc =
+        (elapsedTime.inMilliseconds / duration.inMilliseconds);
+    return percentageCalc > 1 ? 1 : percentageCalc;
   }
 
   get hasEnded => remainingTime.inMilliseconds <= 0;

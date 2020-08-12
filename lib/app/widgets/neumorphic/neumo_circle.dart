@@ -32,9 +32,9 @@ class NeuProgressCircle extends StatefulWidget {
     this.child,
     this.defaultCurve = Curves.fastOutSlowIn,
     this.defaultDuration = const Duration(seconds: 1),
-    this.backgroundColor = Colors.grey,
     this.initialColor = Colors.greenAccent,
     this.finalColor = Colors.redAccent,
+    this.backgroundColor,
   });
 
   @override
@@ -109,9 +109,9 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
             child: Center(
               child: widget.child,
             ),
-            isComplex: true,
             foregroundPainter: EmbossCirclePainter(
-              backgroundColor: widget.backgroundColor,
+              backgroundColor:
+                  widget.backgroundColor ?? Theme.of(context).backgroundColor,
               filledPercentage: 100,
               thickness: 20,
               width: 20,
@@ -153,7 +153,7 @@ class ProgressRequest {
   final Duration duration;
 
   ProgressRequest({
-    this.value = 0.0,
+    this.value,
     this.curve,
     this.duration,
   });
