@@ -8,8 +8,6 @@ void main() {
   runApp(NeumodoreApp());
 }
 
-Color _color = Color(0xFFf2f2f2); // Colors.grey[200]
-
 class NeumodoreApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -18,7 +16,7 @@ class NeumodoreApp extends StatelessWidget {
       statusBarBrightness: Brightness.light,
       statusBarIconBrightness: Brightness.dark,
       systemNavigationBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: _color,
+      systemNavigationBarColor: Colors.transparent,
     ));
 
     return GetMaterialApp(
@@ -26,7 +24,8 @@ class NeumodoreApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       getPages: routes,
       initialRoute: '/home',
-      themeMode: ThemeMode.system,
+      theme: NeumodoreThemes.light(),
+      darkTheme: NeumodoreThemes.dark(),
       // home: CheckScreen(), // (predatorx7) Used to test user issues.
     );
   }

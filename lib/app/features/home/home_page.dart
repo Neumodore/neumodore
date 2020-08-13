@@ -4,12 +4,14 @@ import 'package:get/get.dart';
 import 'package:neumodore/infra/controllers/pomodore_controller/pomodore_controller.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_button.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
+import 'package:neumodore/infra/controllers/settings_controller/settings_controller.dart';
 
 class HomeScreen extends StatelessWidget {
   final neuProgressEndColor = Colors.redAccent;
   final neuProgressStartColor = Colors.greenAccent;
 
   final PomodoreController _homePageCtrl = Get.find();
+  final SettingsController _settingsCtrl = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +36,7 @@ class HomeScreen extends StatelessWidget {
 ${_.durationOSD}
 Pomodores: ${_.finishedPomodores}""",
                       textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headline6,
                     )),
             SizedBox(
               height: Get.mediaQuery.size.height * 0.05,

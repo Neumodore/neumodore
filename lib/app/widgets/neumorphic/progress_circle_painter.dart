@@ -25,7 +25,6 @@ class ProgressCirclePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    int colorStep = 100;
     double blurSize = 6 * embossHeight;
 
     Offset center = Offset(size.width / 2, size.height / 2);
@@ -33,7 +32,6 @@ class ProgressCirclePainter extends CustomPainter {
     double radius = min(size.width / 2, size.height / 2);
 
     double fillArcAngle = 2 * pi * (filledPercentage / 100);
-    double translate = 13 * embossHeight;
 
     buildFillment(
       canvas,
@@ -81,8 +79,6 @@ class ProgressCirclePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    // TODO: implement shouldRepaint
-    return true;
-  }
+  bool shouldRepaint(ProgressCirclePainter oldDelegate) => true;
+  
 }

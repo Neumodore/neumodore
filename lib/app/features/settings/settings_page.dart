@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
-import 'package:neumodore/themes.dart';
-import 'package:neumorphic/neumorphic.dart';
+import 'package:neumodore/infra/controllers/settings_controller/settings_controller.dart';
+import 'package:neumorphic/neumorphic.dart' as neumoLib;
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -12,7 +12,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final NeuProgressController neuProgressController = NeuProgressController();
 
-  String currentTheme = 'light';
+  final SettingsController _settingsController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -20,11 +20,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: Get.theme.backgroundColor,
       appBar: AppBar(
         title: Text(
-          'Neumodore',
-          style: Theme.of(context)
-              .textTheme
-              .headline6
-              .copyWith(color: Colors.black),
+          'Settings',
+          style: Theme.of(context).textTheme.headline5,
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -38,18 +35,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                Text("Switch theme"),
-                NeuSwitch(
-                  backgroundColor: Get.theme.backgroundColor,
-                  groupValue: Get.isDarkMode,
-                  children: {
-                    false: Icon(Icons.brightness_5),
-                    true: Icon(Icons.brightness_7)
-                  },
-                  onValueChanged: (val) {
-                    val
-                        ? Get.changeTheme(NeumodoreThemes.dark())
-                        : Get.changeTheme(NeumodoreThemes.light());
+                Text("Change theme mode"),
+                GetBuilder<SettingsController>(
+                  builder: (_) {
+                    return neumoLib.NeuSwitch(
+                      backgroundColor: Get.theme.backgroundColor,
+                      groupValue: _settingsController.themeMode.index,
+                      children: {
+                        1: Icon(Icons.brightness_high),
+                        2: Icon(Icons.brightness_3)
+                      },
+                      onValueChanged: (themeMode) {
+                        _settingsController.setTheme(themeMode);
+                      },
+                    );
                   },
                 )
               ],

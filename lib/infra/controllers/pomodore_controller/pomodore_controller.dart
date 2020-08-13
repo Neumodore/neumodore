@@ -15,6 +15,8 @@ class PomodoreController extends GetxController {
   PomodoreController(
     IPersistenceAdapter persistenceAdapter,
   ) {
+    print("NEW INSTANCE POMODORE");
+
     stateManager = PomodoreManager(persistenceAdapter);
 
     _timerUpdater = Timer.periodic(Duration(milliseconds: 500), _onTimerUpdate);

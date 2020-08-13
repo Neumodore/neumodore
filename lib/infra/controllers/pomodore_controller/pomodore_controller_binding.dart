@@ -5,13 +5,10 @@ import 'package:neumodore/infra/persistence/sharedprefs_persistence.dart';
 class PomodoreControllerBinding extends Bindings {
   @override
   void dependencies() {
-    Get.lazyPut<SharedPrefsPersistence>(
-      () => SharedPrefsPersistence(),
-    );
+    Get.lazyPut<SharedPrefsPersistence>(() => SharedPrefsPersistence());
+
     Get.lazyPut<PomodoreController>(
-      () => PomodoreController(
-        Get.find<SharedPrefsPersistence>(),
-      ),
+      () => PomodoreController(Get.find<SharedPrefsPersistence>()),
     );
   }
 }

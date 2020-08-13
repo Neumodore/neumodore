@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class AppConfig {
-  AppConfig() {}
+  AppConfig();
 
   Duration pomodoreDuration = Duration(minutes: 25);
   Duration shortBreakDuration = Duration(minutes: 5);

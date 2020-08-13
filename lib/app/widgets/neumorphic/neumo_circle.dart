@@ -59,6 +59,15 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
     widget.controller.animateTo(widget.initialValue);
   }
 
+  void animateTo(ProgressRequest value) {
+    fillController.animateTo(
+      value.value,
+      curve: value.curve ?? widget.defaultCurve,
+      duration: value.duration ?? widget.defaultDuration,
+    );
+    setState(() {});
+  }
+
   @override
   void dispose() {
     super.dispose();
@@ -89,15 +98,6 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
       );
   }
 
-  void animateTo(ProgressRequest value) {
-    fillController.animateTo(
-      value.value,
-      curve: value.curve ?? widget.defaultCurve,
-      duration: value.duration ?? widget.defaultDuration,
-    );
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -111,7 +111,7 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
               child: widget.child,
             ),
             foregroundPainter: EmbossCirclePainter(
-              _currPercent,
+              100,
               backgroundColor:
                   widget.backgroundColor ?? Theme.of(context).backgroundColor,
               thickness: 20,
