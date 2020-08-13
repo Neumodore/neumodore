@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
-import 'package:neumorphic/neumorphic.dart';
+import 'package:neumodore/infra/controllers/settings_controller/settings_controller.dart';
+import 'package:neumorphic/neumorphic.dart' as neumoLib;
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -8,26 +10,18 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  Color backgroundColor = true ? Color(0xFFefeeee) : Color(0xFF1c1f27);
-
-  final neuProgressEndColor = Colors.redAccent;
-  final neuProgressStartColor = Colors.greenAccent;
-
   final NeuProgressController neuProgressController = NeuProgressController();
 
-  double _progressValue = 0.30;
+  final SettingsController _settingsController = Get.find();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
+      backgroundColor: Get.theme.backgroundColor,
       appBar: AppBar(
         title: Text(
-          'Neumodore',
-          style: Theme.of(context)
-              .textTheme
-              .headline6
-              .copyWith(color: Colors.black),
+          'Settings',
+          style: Theme.of(context).textTheme.headline5,
         ),
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -36,59 +30,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[],
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Text("Change theme mode"),
+                GetBuilder<SettingsController>(
+                  builder: (_) {
+                    return neumoLib.NeuSwitch(
+                      backgroundColor: Get.theme.backgroundColor,
+                      groupValue: _settingsController.themeMode.index,
+                      children: {
+                        1: Icon(Icons.brightness_high),
+                        2: Icon(Icons.brightness_3)
+                      },
+                      onValueChanged: (themeMode) {
+                        _settingsController.setTheme(themeMode);
+                      },
+                    );
+                  },
+                )
+              ],
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  padding: EdgeInsets.only(top: 50),
-                  child: NeuButton(
-                    onPressed: () async {
-                      updateProgress(.01);
-                    },
-                    padding: EdgeInsets.all(20),
-                    child: Text("- -"),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: 50),
-                  child: NeuButton(
-                    onPressed: () {},
-                    padding: EdgeInsets.all(20),
-                    child: Text(
-                      "${_progressValue.toStringAsFixed(2)}",
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(top: 50),
-                  child: NeuButton(
-                    onPressed: () async {
-                      updateProgress(1);
-                    },
-                    padding: EdgeInsets.all(20),
-                    child: Text("++"),
-                  ),
-                ),
-              ],
+              children: <Widget>[],
             ),
           ],
         ),
       ),
     );
-  }
-
-  void updateProgress(double newvalue) {
-    setState(() {
-      _progressValue = newvalue;
-      neuProgressController.animateTo(
-        newvalue,
-      );
-    });
   }
 }

@@ -14,6 +14,7 @@ class NeuProgressCircle extends StatefulWidget {
 
   /// Default animation duration
   final Duration defaultDuration;
+  final Curve defaultCurve;
 
   final Color backgroundColor;
   final Color finalColor;
@@ -25,25 +26,37 @@ class NeuProgressCircle extends StatefulWidget {
 
   final Widget child;
 
+  final Curve introDefaultCurve;
+
+  final Duration introDuration;
+
   NeuProgressCircle({
+    Key key,
     this.controller,
     this.initialValue,
     this.child,
+    this.defaultCurve = Curves.fastOutSlowIn,
     this.defaultDuration = const Duration(seconds: 1),
-    this.backgroundColor = Colors.grey,
     this.initialColor = Colors.greenAccent,
     this.finalColor = Colors.redAccent,
-  });
+    this.backgroundColor,
+    this.introDefaultCurve = Curves.easeInOutCubic,
+    this.introDuration = const Duration(seconds: 5),
+  }) : super(key: key);
 
   @override
   _NeuProgressCircleState createState() => _NeuProgressCircleState();
 }
 
 class _NeuProgressCircleState extends State<NeuProgressCircle>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   double _currPercent = 0.0;
+
   Color _currColor;
   AnimationController fillController;
+
+  AnimationController elevationController;
+  double _currElevation = 0.0;
 
   @override
   void initState() {
@@ -51,8 +64,24 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
 
     initControllers();
 
-    widget.controller.animationStream.listen(this.animateTo);
+    widget.controller.progressChangeStream.listen(this.animateTo);
     widget.controller.animateTo(widget.initialValue);
+
+    elevationController.animateTo(
+      1,
+      curve: widget.introDefaultCurve,
+      duration: widget.introDuration,
+    );
+  }
+
+  void animateTo(ProgressRequest value) {
+    setState(() {
+      fillController.animateTo(
+        value.value,
+        curve: value.curve ?? widget.defaultCurve,
+        duration: value.duration ?? widget.defaultDuration,
+      );
+    });
   }
 
   @override
@@ -62,37 +91,40 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
 
   void initControllers() {
     _currColor = widget.initialColor;
+
+    elevationController = AnimationController(
+      vsync: this,
+      animationBehavior: AnimationBehavior.normal,
+      lowerBound: 0,
+      upperBound: 1,
+      duration: Duration(seconds: 5),
+    )..addListener(() {
+        setState(() {
+          _currElevation = lerpDouble(
+            0,
+            1,
+            elevationController.value,
+          );
+        });
+      });
+
     fillController = AnimationController(
       vsync: this,
       duration: widget.defaultDuration,
-    )..addListener(
-        () {
-          setState(
-            () {
-              _currColor = Color.lerp(
-                widget.initialColor,
-                widget.finalColor,
-                fillController.value,
-              );
-              _currPercent = lerpDouble(
-                0,
-                100,
-                fillController.value,
-              );
-            },
+    )..addListener(() {
+        setState(() {
+          _currColor = Color.lerp(
+            widget.initialColor,
+            widget.finalColor,
+            fillController.value,
           );
-        },
-      );
-  }
-
-  void animateTo(ProgressRequest value) {
-    setState(() {
-      fillController.animateTo(
-        value.value,
-        curve: value.curve ?? Curves.easeOutQuint,
-        duration: value.duration ?? widget.defaultDuration,
-      );
-    });
+          _currPercent = lerpDouble(
+            0,
+            100,
+            fillController.value,
+          );
+        });
+      });
   }
 
   @override
@@ -103,20 +135,41 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
       width: 200,
       child: Stack(
         children: <Widget>[
+          // Container(
+          //   decoration: BoxDecoration(
+          //     borderRadius: BorderRadius.circular(100),
+          //     color: Theme.of(context).cursorColor,
+          //     boxShadow: [
+          //       BoxShadow(
+          //         color: Colors.black.withOpacity(0.5),
+          //         blurRadius: 20,
+          //         offset: Offset(10, 10),
+          //       ),
+          //       BoxShadow(
+          //         color: Colors.white.withOpacity(0.5),
+          //         blurRadius: 20,
+          //         offset: Offset(-10, -10),
+          //       ),
+          //     ],
+          //   ),
+          //   constraints: BoxConstraints.expand(),
+          //   child: Center(
+          //     child: widget.child,
+          //   ),
+          // ),
           CustomPaint(
             child: Center(
               child: widget.child,
             ),
-            isComplex: true,
             foregroundPainter: EmbossCirclePainter(
-              backgroundColor: widget.backgroundColor,
-              filledPercentage: 100,
-              thickness: 20,
+              100,
+              backgroundColor:
+                  widget.backgroundColor ?? Theme.of(context).backgroundColor,
+              thickness: 9,
               width: 20,
-              embossHeight: widget.embossHeight,
+              embossHeight: _currElevation,
             ),
           ),
-          // circleFill(),
           _buildColorFill(),
           buildGlowFX()
         ],
@@ -151,7 +204,7 @@ class ProgressRequest {
   final Duration duration;
 
   ProgressRequest({
-    this.value = 0,
+    this.value,
     this.curve,
     this.duration,
   });
@@ -173,7 +226,7 @@ class NeuProgressController {
     ));
   }
 
-  Stream<ProgressRequest> get animationStream =>
+  Stream<ProgressRequest> get progressChangeStream =>
       _percentStreamController.stream;
 
   void dispose() {

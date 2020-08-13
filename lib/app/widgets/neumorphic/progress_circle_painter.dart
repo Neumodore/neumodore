@@ -25,7 +25,6 @@ class ProgressCirclePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    int colorStep = 100;
     double blurSize = 6 * embossHeight;
 
     Offset center = Offset(size.width / 2, size.height / 2);
@@ -33,7 +32,6 @@ class ProgressCirclePainter extends CustomPainter {
     double radius = min(size.width / 2, size.height / 2);
 
     double fillArcAngle = 2 * pi * (filledPercentage / 100);
-    double translate = 13 * embossHeight;
 
     buildFillment(
       canvas,
@@ -65,15 +63,31 @@ class ProgressCirclePainter extends CustomPainter {
 
     canvas.drawPath(
       Path()
-        ..addArc(Rect.fromCircle(center: center, radius: radius), -pi / 2,
-            fillArcAngle),
+        ..addArc(
+          Rect.fromCircle(center: center, radius: radius),
+          -pi / 2,
+          fillArcAngle,
+        ),
       Paint()
         ..color = fillColor
+        ..strokeWidth = thickness
+        ..maskFilter = MaskFilter.blur(BlurStyle.outer, 7)
+        ..style = PaintingStyle.stroke
+        ..blendMode = BlendMode.color
+        ..strokeCap = StrokeCap.round,
+    );
+
+    canvas.drawPath(
+      Path()
+        ..addArc(
+          Rect.fromCircle(center: center, radius: radius),
+          -pi / 2,
+          fillArcAngle,
+        ),
+      Paint()
+        ..color = Colors.white.withOpacity(0.5)
         ..strokeWidth = thickness / 2
-        ..imageFilter = ImageFilter.blur(
-          sigmaX: blurSize,
-          sigmaY: blurSize,
-        )
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 5)
         ..style = PaintingStyle.stroke
         ..blendMode = BlendMode.plus
         ..strokeCap = StrokeCap.round,
@@ -81,8 +95,5 @@ class ProgressCirclePainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) {
-    // TODO: implement shouldRepaint
-    return true;
-  }
+  bool shouldRepaint(ProgressCirclePainter oldDelegate) => true;
 }
