@@ -10,7 +10,7 @@ class EmbossCirclePainter extends CustomPainter {
   Color backgroundColor;
   double width;
   double thickness;
-  double embossHeight = 1.0;
+  double embossHeight;
 
   Paint fillPaint = Paint();
   Paint lightPaint = Paint();
@@ -20,92 +20,93 @@ class EmbossCirclePainter extends CustomPainter {
     this.currentPercentage, {
     this.backgroundColor = Colors.white,
     this.thickness,
-    this.width,
+    this.width = 20,
     this.embossHeight = 1.0,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    double blurSize = 6 * embossHeight;
+    double blurSize = 9 * embossHeight;
 
     Offset center = Offset(size.width / 2, size.height / 2);
 
     double radius = min(size.width / 2, size.height / 2);
 
-    double fillArcAngle = 2 * pi * (currentPercentage / 100);
-    double translate = 13 * embossHeight;
-    buildLight(
-      canvas,
-      center.translate(-translate, -translate),
-      radius,
-      fillArcAngle,
-      blurSize / 1.5,
-    );
-    buildShadow(
-      canvas,
-      center.translate(translate, translate),
-      radius,
-      fillArcAngle,
-      blurSize,
-    );
-    buildFillment(canvas, center, radius, fillArcAngle);
-  }
+    double shadowDistance = 5 * embossHeight;
 
-  void buildFillment(
-      Canvas canvas, Offset center, double radius, double fillArcAngle) {
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -pi / 2,
-      fillArcAngle,
-      false,
-      fillPaint
-        ..color = backgroundColor
-        ..strokeWidth = thickness
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round,
-    );
-  }
+    double outerRadius = radius * 1.05;
+    Function innerRadius = (multiplier) {
+      final calced = outerRadius - (thickness * multiplier);
+      return calced > outerRadius - 6 ? outerRadius - 6 : calced;
+    };
+    Function innerShadowRadius = (multiplier) {
+      final calced = innerRadius(multiplier);
+      return calced > outerRadius - 5 ? outerRadius - 5 : calced;
+    };
 
-  void buildLight(Canvas canvas, Offset center, double radius,
-      double fillArcAngle, double blurSize) {
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -pi / 2,
-      fillArcAngle,
-      false,
-      lightPaint
-        ..color = Colors.grey[700]
-        ..strokeWidth = thickness * 5 / (radius)
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..blendMode = BlendMode.plus
-        ..imageFilter = ImageFilter.blur(sigmaX: blurSize, sigmaY: blurSize),
+    var fillCenter = center;
+    Path fillBorder = Path.combine(
+      PathOperation.difference,
+      Path()..addOval(Rect.fromCircle(center: fillCenter, radius: outerRadius)),
+      Path()
+        ..addOval(Rect.fromCircle(center: fillCenter, radius: innerRadius(1))),
     );
-  }
 
-  void buildShadow(
-    Canvas canvas,
-    Offset center,
-    double radius,
-    double fillArcAngle,
-    double blurSize,
-  ) {
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -pi / 2,
-      fillArcAngle,
-      false,
-      shadowPaint
-        ..color = Colors.black87
-        ..strokeWidth = thickness * 10 / (radius)
-        ..style = PaintingStyle.stroke
-        ..strokeCap = StrokeCap.round
-        ..blendMode = BlendMode.darken
-        ..imageFilter = ImageFilter.blur(sigmaX: blurSize, sigmaY: blurSize),
+    var lightCenter = center.translate(-shadowDistance, -shadowDistance);
+    Path lightBorder = Path.combine(
+      PathOperation.difference,
+      Path.combine(
+        PathOperation.difference,
+        Path()
+          ..addOval(
+            Rect.fromCircle(center: lightCenter, radius: outerRadius * 0.97),
+          ),
+        Path()
+          ..addOval(
+              Rect.fromCircle(center: lightCenter, radius: innerRadius(0.7))),
+      ),
+      fillBorder,
     );
+    Offset shadowCenter = center.translate(shadowDistance, shadowDistance);
+    Path shadowBorder = Path.combine(
+      PathOperation.difference,
+      Path.combine(
+        PathOperation.difference,
+        Path()
+          ..addOval(
+              Rect.fromCircle(center: shadowCenter, radius: outerRadius * 1.0)),
+        Path()
+          ..addOval(Rect.fromCircle(
+              center: shadowCenter, radius: innerShadowRadius(1))),
+      ),
+      fillBorder,
+    );
+
+    canvas
+      ..drawPath(
+        shadowBorder,
+        Paint()
+          ..color = Colors.black.withOpacity(0.5)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurSize)
+          ..blendMode = BlendMode.colorBurn,
+      );
+
+    canvas
+      ..drawPath(
+        lightBorder,
+        Paint()
+          ..color = Colors.white.withOpacity(0.5)
+          ..maskFilter = MaskFilter.blur(BlurStyle.normal, blurSize)
+          ..blendMode = BlendMode.plus,
+      );
+
+    canvas
+      ..drawPath(
+        fillBorder,
+        Paint()..color = backgroundColor,
+      );
   }
 
   @override
-  bool shouldRepaint(EmbossCirclePainter oldDelegate) =>
-      oldDelegate.currentPercentage != this.currentPercentage;
+  bool shouldRepaint(EmbossCirclePainter oldDelegate) => true;
 }

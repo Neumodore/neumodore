@@ -1,49 +1,42 @@
 import 'dart:async';
 
-import 'package:assets_audio_player/assets_audio_player.dart';
-import 'package:get/get.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumodore/infra/managers/pomodore_manager/pomodore_manager.dart';
-import 'package:neumodore/infra/persistence/ipersistence_adapter.dart';
+import 'package:neumodore/infra/repositories/istate_repository.dart';
 import 'package:wakelock/wakelock.dart';
+import 'package:assets_audio_player/assets_audio_player.dart';
+import 'package:get/get.dart';
 
 enum ControllerState { PAUSED, RUNING, STOPPED, COMPLETED }
 
 class PomodoreController extends GetxController {
   final NeuProgressController neuProgressController = NeuProgressController();
+  Timer _timerUpdater;
+  PomodoreManager stateManager;
+  ControllerState _currentState = ControllerState.STOPPED;
 
   PomodoreController(
-    IPersistenceAdapter persistenceAdapter,
+    IPomodoreRepository persistenceAdapter,
   ) {
-    print("NEW INSTANCE POMODORE");
-
     stateManager = PomodoreManager(persistenceAdapter);
-
     _timerUpdater = Timer.periodic(Duration(milliseconds: 500), _onTimerUpdate);
   }
 
   double lastPercentageUpdate = 0.0;
   void _onTimerUpdate(var tim) {
-    if (getState() == ControllerState.RUNING &&
-        stateManager.percentageComplete >= 1) {
-      changeState(ControllerState.COMPLETED);
-    }
-
-    if (stateManager.percentageComplete != lastPercentageUpdate) {
-      neuProgressController.animateTo(stateManager.percentageComplete);
-      print('Runing');
-      print(this.stateManager.percentageComplete);
-      print(this.getState().toString());
-      lastPercentageUpdate = stateManager.percentageComplete;
-      update();
+    print(this.getState().toString());
+    print(this.stateManager.percentageComplete);
+    if (getState() == ControllerState.RUNING) {
+      if (stateManager.percentageComplete >= 1) {
+        changeState(ControllerState.COMPLETED);
+      }
+      if (stateManager.percentageComplete != lastPercentageUpdate) {
+        neuProgressController.animateTo(stateManager.percentageComplete);
+        lastPercentageUpdate = stateManager.percentageComplete;
+        update();
+      }
     }
   }
-
-  Timer _timerUpdater;
-
-  PomodoreManager stateManager;
-
-  ControllerState _currentState = ControllerState.STOPPED;
 
   ControllerState getState() {
     return _currentState;

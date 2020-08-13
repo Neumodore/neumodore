@@ -1,10 +1,10 @@
 import 'package:neumodore/data/activity/activity.dart';
 import 'package:neumodore/data/interruption.dart';
 import 'package:neumodore/data/pomodore_state.dart';
-import 'package:neumodore/infra/persistence/ipersistence_adapter.dart';
+import 'package:neumodore/infra/repositories/istate_repository.dart';
 
 class PomodoreManager {
-  IPersistenceAdapter _persistenceAdapter;
+  IPomodoreRepository _persistenceAdapter;
   PomodoreState _pomodoreState = PomodoreState(PomodoreActivity());
 
   DateTime _interruptionStartAt;

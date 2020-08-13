@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:neumodore/infra/repositories/theme_repository.dart';
+import 'package:neumodore/infra/repositories/app_repository.dart';
+import 'package:neumodore/infra/repositories/istate_repository.dart';
 
 class SettingsController extends GetxController {
-  ThemeModeRepository _themeRepo;
+  IThemeRepository _themeRepo;
 
   ThemeMode _themeMode = ThemeMode.light;
 
@@ -15,7 +16,7 @@ class SettingsController extends GetxController {
   ThemeMode get themeMode => _themeMode;
 
   SettingsController(this._themeRepo) {
-    _themeRepo.getThemeMode().then((value) {
+    _themeRepo.loadThemeMode().then((value) {
       themeMode = value;
       Get.changeThemeMode(themeMode);
     }).catchError((error) {
@@ -32,8 +33,8 @@ class SettingsController extends GetxController {
   }
 
   void switchTheme() async {
-    ThemeMode curTheme = await _themeRepo.getThemeMode();
-    _themeRepo.setThemeMode(
+    ThemeMode curTheme = await _themeRepo.loadThemeMode();
+    _themeRepo.saveThemeMode(
       curTheme == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark,
     );
     update();
@@ -41,8 +42,8 @@ class SettingsController extends GetxController {
 
   void setTheme(int val) async {
     try {
-      await _themeRepo.setThemeMode(_themeRepo.fromIndex(val));
-      Get.changeThemeMode(_themeRepo.fromIndex(val));
+      await _themeRepo.saveThemeMode(_themeRepo.themeModeFromIndex(val));
+      Get.changeThemeMode(_themeRepo.themeModeFromIndex(val));
     } catch (e) {
       print({'[----ERROR]': e});
     }
@@ -52,7 +53,7 @@ class SettingsController extends GetxController {
 
   void refreshTheme() async {
     try {
-      ThemeMode curTheme = await _themeRepo.getThemeMode();
+      ThemeMode curTheme = await _themeRepo.loadThemeMode();
       Get.changeThemeMode(curTheme);
     } catch (e) {
       Get.changeThemeMode(

@@ -67,11 +67,21 @@ class ProgressCirclePainter extends CustomPainter {
             fillArcAngle),
       Paint()
         ..color = fillColor
+        ..strokeWidth = thickness
+        ..maskFilter = MaskFilter.blur(BlurStyle.outer, 7)
+        ..style = PaintingStyle.stroke
+        ..blendMode = BlendMode.color
+        ..strokeCap = StrokeCap.round,
+    );
+
+    canvas.drawPath(
+      Path()
+        ..addArc(Rect.fromCircle(center: center, radius: radius), -pi / 2,
+            fillArcAngle),
+      Paint()
+        ..color = Colors.white.withOpacity(0.5)
         ..strokeWidth = thickness / 2
-        ..imageFilter = ImageFilter.blur(
-          sigmaX: blurSize,
-          sigmaY: blurSize,
-        )
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, 5)
         ..style = PaintingStyle.stroke
         ..blendMode = BlendMode.plus
         ..strokeCap = StrokeCap.round,
@@ -80,5 +90,4 @@ class ProgressCirclePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(ProgressCirclePainter oldDelegate) => true;
-  
 }
