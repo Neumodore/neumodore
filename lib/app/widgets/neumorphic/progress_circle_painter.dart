@@ -63,8 +63,11 @@ class ProgressCirclePainter extends CustomPainter {
 
     canvas.drawPath(
       Path()
-        ..addArc(Rect.fromCircle(center: center, radius: radius), -pi / 2,
-            fillArcAngle),
+        ..addArc(
+          Rect.fromCircle(center: center, radius: radius),
+          -pi / 2,
+          fillArcAngle,
+        ),
       Paint()
         ..color = fillColor
         ..strokeWidth = thickness
@@ -76,8 +79,11 @@ class ProgressCirclePainter extends CustomPainter {
 
     canvas.drawPath(
       Path()
-        ..addArc(Rect.fromCircle(center: center, radius: radius), -pi / 2,
-            fillArcAngle),
+        ..addArc(
+          Rect.fromCircle(center: center, radius: radius),
+          -pi / 2,
+          fillArcAngle,
+        ),
       Paint()
         ..color = Colors.white.withOpacity(0.5)
         ..strokeWidth = thickness / 2

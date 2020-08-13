@@ -31,7 +31,7 @@ class EmbossCirclePainter extends CustomPainter {
     Offset center = Offset(size.width / 2, size.height / 2);
 
     double radius = min(size.width / 2, size.height / 2);
-
+    double arcAngle = 2 * pi * (currentPercentage);
     double shadowDistance = 5 * embossHeight;
 
     double outerRadius = radius * 1.05;
@@ -100,10 +100,38 @@ class EmbossCirclePainter extends CustomPainter {
           ..blendMode = BlendMode.plus,
       );
 
+    Rect boundingSquare = Rect.fromCircle(center: center, radius: radius);
+
+    gradientPaint(List<Color> colors,
+        {double startAngle = 0.0, double endAngle = pi * 2}) {
+      final Gradient gradient = LinearGradient(
+        colors: colors,
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      );
+
+      return Paint()
+        ..strokeCap = StrokeCap.round
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = thickness
+        ..shader = gradient.createShader(boundingSquare);
+    }
+
+    var gradientStartAngle = 2 * pi / 2;
+    var gradientEndAngle = 6 * pi / 2;
+    var lightlerp = Color.lerp(backgroundColor, Colors.white, 0.05);
+    var shadowlerp = Color.lerp(backgroundColor, Colors.black, 0.05);
+
+    var startColor = Color.lerp(shadowlerp, lightlerp, 1 * embossHeight);
+    var endCOlor = Color.lerp(lightlerp, shadowlerp, 1 * embossHeight);
     canvas
       ..drawPath(
         fillBorder,
-        Paint()..color = backgroundColor,
+        gradientPaint(
+          [startColor, endCOlor],
+          endAngle: gradientEndAngle,
+          startAngle: gradientStartAngle,
+        ),
       );
   }
 

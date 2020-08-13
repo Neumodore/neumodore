@@ -26,6 +26,10 @@ class NeuProgressCircle extends StatefulWidget {
 
   final Widget child;
 
+  final Curve introDefaultCurve;
+
+  final Duration introDuration;
+
   NeuProgressCircle({
     Key key,
     this.controller,
@@ -36,6 +40,8 @@ class NeuProgressCircle extends StatefulWidget {
     this.initialColor = Colors.greenAccent,
     this.finalColor = Colors.redAccent,
     this.backgroundColor,
+    this.introDefaultCurve = Curves.easeInOutCubic,
+    this.introDuration = const Duration(seconds: 5),
   }) : super(key: key);
 
   @override
@@ -61,7 +67,11 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
     widget.controller.progressChangeStream.listen(this.animateTo);
     widget.controller.animateTo(widget.initialValue);
 
-    elevationController.animateTo(1, curve: widget.defaultCurve);
+    elevationController.animateTo(
+      1,
+      curve: widget.introDefaultCurve,
+      duration: widget.introDuration,
+    );
   }
 
   void animateTo(ProgressRequest value) {
@@ -87,7 +97,7 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
       animationBehavior: AnimationBehavior.normal,
       lowerBound: 0,
       upperBound: 1,
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 5),
     )..addListener(() {
         setState(() {
           _currElevation = lerpDouble(
