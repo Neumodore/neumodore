@@ -31,7 +31,6 @@ class EmbossCirclePainter extends CustomPainter {
     Offset center = Offset(size.width / 2, size.height / 2);
 
     double radius = min(size.width / 2, size.height / 2);
-    double arcAngle = 2 * pi * (currentPercentage);
     double shadowDistance = 5 * embossHeight;
 
     double outerRadius = radius * 1.05;
@@ -44,15 +43,13 @@ class EmbossCirclePainter extends CustomPainter {
       return calced > outerRadius - 5 ? outerRadius - 5 : calced;
     };
 
-    var fillCenter = center;
     Path fillBorder = Path.combine(
       PathOperation.difference,
-      Path()..addOval(Rect.fromCircle(center: fillCenter, radius: outerRadius)),
-      Path()
-        ..addOval(Rect.fromCircle(center: fillCenter, radius: innerRadius(1))),
+      Path()..addOval(Rect.fromCircle(center: center, radius: outerRadius)),
+      Path()..addOval(Rect.fromCircle(center: center, radius: innerRadius(1))),
     );
 
-    var lightCenter = center.translate(-shadowDistance, -shadowDistance);
+    final lightCenter = center.translate(-shadowDistance, -shadowDistance);
     Path lightBorder = Path.combine(
       PathOperation.difference,
       Path.combine(

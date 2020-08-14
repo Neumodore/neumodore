@@ -41,7 +41,7 @@ class NeuProgressCircle extends StatefulWidget {
     this.finalColor = Colors.redAccent,
     this.backgroundColor,
     this.introDefaultCurve = Curves.easeInOutCubic,
-    this.introDuration = const Duration(seconds: 5),
+    this.introDuration = const Duration(seconds: 3),
   }) : super(key: key);
 
   @override
@@ -58,10 +58,15 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
   AnimationController elevationController;
   double _currElevation = 0.0;
 
+  Timer _drawUpdater;
+
   @override
   void initState() {
     super.initState();
 
+    _drawUpdater = Timer.periodic(Duration(milliseconds: 200), (timer) {
+      setState(() {});
+    });
     initControllers();
 
     widget.controller.progressChangeStream.listen(this.animateTo);
@@ -86,6 +91,9 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
 
   @override
   void dispose() {
+    _drawUpdater.cancel();
+    this.fillController.dispose();
+    this.elevationController.dispose();
     super.dispose();
   }
 
@@ -135,33 +143,11 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
       width: 200,
       child: Stack(
         children: <Widget>[
-          // Container(
-          //   decoration: BoxDecoration(
-          //     borderRadius: BorderRadius.circular(100),
-          //     color: Theme.of(context).cursorColor,
-          //     boxShadow: [
-          //       BoxShadow(
-          //         color: Colors.black.withOpacity(0.5),
-          //         blurRadius: 20,
-          //         offset: Offset(10, 10),
-          //       ),
-          //       BoxShadow(
-          //         color: Colors.white.withOpacity(0.5),
-          //         blurRadius: 20,
-          //         offset: Offset(-10, -10),
-          //       ),
-          //     ],
-          //   ),
-          //   constraints: BoxConstraints.expand(),
-          //   child: Center(
-          //     child: widget.child,
-          //   ),
-          // ),
           CustomPaint(
             child: Center(
               child: widget.child,
             ),
-            foregroundPainter: EmbossCirclePainter(
+            painter: EmbossCirclePainter(
               100,
               backgroundColor:
                   widget.backgroundColor ?? Theme.of(context).backgroundColor,
@@ -191,7 +177,7 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
       foregroundPainter: ProgressCirclePainter(
         fillColor: _currColor,
         filledPercentage: _currPercent,
-        thickness: 25,
+        thickness: _currElevation * 25,
         width: 20,
       ),
     );

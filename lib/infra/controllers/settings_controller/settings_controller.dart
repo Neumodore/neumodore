@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:neumodore/infra/repositories/app_repository.dart';
 import 'package:neumodore/infra/repositories/istate_repository.dart';
 
 class SettingsController extends GetxController {
@@ -20,7 +19,7 @@ class SettingsController extends GetxController {
       themeMode = value;
       Get.changeThemeMode(themeMode);
     }).catchError((error) {
-      print({'[SETTINGS ERROR]': error});
+      print({'[LOAD THEME ERROR]': error});
       return Get.changeThemeMode(
         Get.isPlatformDarkMode ? ThemeMode.dark : ThemeMode.light,
       );

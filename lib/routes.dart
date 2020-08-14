@@ -3,20 +3,31 @@ import 'package:neumodore/app/features/home/home_page.dart';
 import 'package:neumodore/app/features/settings/settings_page.dart';
 import 'package:neumodore/infra/controllers/pomodore_controller/pomodore_controller_binding.dart';
 import 'package:neumodore/infra/controllers/settings_controller/settings_controler_bindings.dart';
+import 'package:neumodore/infra/controllers/splashcreen_controller/splashscreen_binding.dart';
+
+import 'app/features/intro/intro.dart';
 
 final routes = [
+  GetPage(
+    name: IntroScreen.name,
+    page: () => IntroScreen(),
+    binding: SplashScreenBinding(),
+  ),
   //Simple GetPage
   GetPage(
-    name: '/home',
+    name: HomeScreen.name,
     page: () => HomeScreen(),
-    binding: PomodoreControllerBinding(),
+    transition: Transition.leftToRight,
     bindings: [
+      PomodoreControllerBinding(),
       SettingsScreenBinding(),
     ],
-  ), // GetPage with custom transitions and bindings
+  ),
   GetPage(
-    name: '/settings',
+    name: SettingsScreen.name,
     page: () => SettingsScreen(),
+    transition: Transition.rightToLeft,
+    title: "Settings",
     binding: SettingsScreenBinding(),
   ),
 ];

@@ -24,7 +24,7 @@ class NeumoButton extends StatelessWidget {
       decoration: NeumorphicDecoration(
         color: backgroundColor ?? Theme.of(context).backgroundColor,
         shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(15),
       ),
     );
   }

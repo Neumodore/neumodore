@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
 class NeumodoreThemes {
-  static ThemeData dark() => ThemeData.dark().copyWith(
-        backgroundColor: Color(0xFF1c1f27),
-      );
+  static ThemeData dark() {
+    var darkBlueBackgroundColor = Color(0xFF1c1f27);
+    return ThemeData.dark().copyWith(
+      backgroundColor: darkBlueBackgroundColor,
+      scaffoldBackgroundColor: darkBlueBackgroundColor,
+    );
+  }
 
   static ThemeData light() {
     final lightGreyBackgroundColor = Color(0xFFefeeee);
@@ -12,11 +16,11 @@ class NeumodoreThemes {
       accentColor: Colors.grey,
       colorScheme: ColorScheme.light(),
       backgroundColor: lightGreyBackgroundColor,
-      scaffoldBackgroundColor: Color(0xFFefeeee),
+      scaffoldBackgroundColor: lightGreyBackgroundColor,
       dialogBackgroundColor: Colors.grey[300],
       appBarTheme: AppBarTheme(
         brightness: Brightness.light,
-        color: Color(0xFFefeeee),
+        color: lightGreyBackgroundColor,
         textTheme: TextTheme(
           headline6: TextStyle(
             color: Colors.black,

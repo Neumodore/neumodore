@@ -24,9 +24,9 @@ class PomodoreController extends GetxController {
 
   double lastPercentageUpdate = 0.0;
   void _onTimerUpdate(var tim) {
-    print(this.getState().toString());
-    print(this.stateManager.percentageComplete);
     if (getState() == ControllerState.RUNING) {
+      print(this.getState().toString());
+      print(this.stateManager.percentageComplete);
       if (stateManager.percentageComplete >= 1) {
         changeState(ControllerState.COMPLETED);
       }

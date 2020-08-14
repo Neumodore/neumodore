@@ -10,21 +10,20 @@ const String THEME_STORAGE_KEY = "theme_storage";
 const String STATE_KEY = 'statekey';
 
 class AppStateRepository implements IApplicationRepository {
-  SharedPreferences _sharedPrefs;
+  Future<SharedPreferences> _sharedPrefs;
 
-  AppStateRepository(Future<SharedPreferences> sharedPrefsInstance) {
+  AppStateRepository(this._sharedPrefs) {
     WidgetsFlutterBinding.ensureInitialized();
-    sharedPrefsInstance.then((value) => _sharedPrefs = value);
   }
 
   @override
   Future<AppConfig> loadConfig({AppConfig standardValue}) async {
-    return AppConfig.fromJson(_sharedPrefs.getString(CONFIG_KEY));
+    return AppConfig.fromJson((await _sharedPrefs).getString(CONFIG_KEY));
   }
 
   @override
-  Future<void> saveConfig(AppConfig state) async {
-    await _sharedPrefs.setString(CONFIG_KEY, state.toJson());
+  Future<bool> saveConfig(AppConfig state) async {
+    return (await _sharedPrefs).setString(CONFIG_KEY, state.toJson());
   }
 
   @override
@@ -38,22 +37,22 @@ class AppStateRepository implements IApplicationRepository {
   @override
   Future<ThemeMode> loadThemeMode({ThemeMode standardValue}) async {
     return themeModeFromIndex(
-      int.parse(
-        (await SharedPreferences.getInstance())
-            .getString(THEME_STORAGE_KEY)
-            .toString(),
-      ),
+      (await _sharedPrefs).getString(THEME_STORAGE_KEY).toString(),
     );
   }
 
   @override
   Future saveThemeMode(ThemeMode mode) async {
-    await (await SharedPreferences.getInstance())
-        .setString(THEME_STORAGE_KEY, mode.index.toString());
+    await (await _sharedPrefs).setString(
+      THEME_STORAGE_KEY,
+      mode.index.toString(),
+    );
   }
 
   @override
-  ThemeMode themeModeFromIndex(int index) {
-    return ThemeMode.values.elementAt(index);
+  ThemeMode themeModeFromIndex(dynamic index) {
+    return ThemeMode.values.elementAt(
+      int.parse(index.toString()),
+    );
   }
 }
