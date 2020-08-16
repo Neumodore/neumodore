@@ -11,7 +11,10 @@ final routes = [
   GetPage(
     name: IntroScreen.name,
     page: () => IntroScreen(),
-    binding: SplashScreenBinding(),
+    bindings: [
+      SplashScreenBinding(),
+      SettingsScreenBinding(),
+    ],
   ),
   //Simple GetPage
   GetPage(
@@ -20,7 +23,6 @@ final routes = [
     transition: Transition.leftToRight,
     bindings: [
       PomodoreControllerBinding(),
-      SettingsScreenBinding(),
     ],
   ),
   GetPage(

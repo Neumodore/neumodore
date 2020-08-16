@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:neumodore/infra/controllers/pomodore_controller/pomodore_controller.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_button.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
-import 'package:neumodore/infra/controllers/settings_controller/settings_controller.dart';
 
 class HomeScreen extends StatelessWidget {
   static String name = '/home';
@@ -12,90 +11,84 @@ class HomeScreen extends StatelessWidget {
   final neuProgressStartColor = Colors.greenAccent;
 
   final PomodoreController _homePageCtrl = Get.find();
-  final SettingsController _settingsCtrl = Get.find();
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        return false;
-      },
-      child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(80),
-          child: AppBar(
-            leading: SizedBox(),
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-            primary: true,
-            flexibleSpace: _buildTopBar(context),
-          ),
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(80),
+        child: AppBar(
+          leading: SizedBox(),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          primary: true,
+          flexibleSpace: _buildTopBar(context),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              GetBuilder<PomodoreController>(
-                  builder: (_) => Text(
-                        """Duration
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            GetBuilder<PomodoreController>(
+                builder: (_) => Text(
+                      """Duration
 ${_.durationOSD}
 Pomodores: ${_.finishedPomodores}""",
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6,
-                      )),
-              SizedBox(
-                height: Get.mediaQuery.size.height * 0.05,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headline6,
+                    )),
+            SizedBox(
+              height: Get.mediaQuery.size.height * 0.05,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                NeuProgressCircle(
+                  child: GetBuilder<PomodoreController>(
+                    builder: (_) {
+                      return Text(
+                        '${_.timerOSD}',
+                        style: TextStyle(
+                          fontSize: 24,
+                        ),
+                      );
+                    },
+                  ),
+                  initialValue: 0.01,
+                  defaultDuration: Duration(seconds: 4),
+                  defaultCurve: Curves.easeOutQuart,
+                  controller: _homePageCtrl.neuProgressController,
+                ),
+              ],
+            ),
+            GetBuilder<PomodoreController>(builder: (_) {
+              return _buildControlls(_.getState());
+            }),
+            Padding(
+              padding: const EdgeInsets.only(top: 30.0),
+              child: Row(
                 children: <Widget>[
-                  NeuProgressCircle(
-                    child: GetBuilder<PomodoreController>(
-                      builder: (_) {
-                        return Text(
-                          '${_.timerOSD}',
-                          style: TextStyle(
-                            fontSize: 24,
-                          ),
+                  Expanded(
+                    child: Container(
+                      height: 50,
+                      child: GetBuilder<PomodoreController>(builder: (_) {
+                        List<Widget> dots = [];
+                        if (_.finishedPomodores > 0) {
+                          for (var i = 0; i < _.finishedPomodores; i++) {
+                            dots.add(_buildDot());
+                          }
+                        }
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: dots,
                         );
-                      },
+                      }),
                     ),
-                    initialValue: 0.01,
-                    defaultDuration: Duration(seconds: 4),
-                    defaultCurve: Curves.easeOutQuart,
-                    controller: _homePageCtrl.neuProgressController,
                   ),
                 ],
               ),
-              GetBuilder<PomodoreController>(builder: (_) {
-                return _buildControlls(_.getState());
-              }),
-              Padding(
-                padding: const EdgeInsets.only(top: 30.0),
-                child: Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Container(
-                        height: 50,
-                        child: GetBuilder<PomodoreController>(builder: (_) {
-                          List<Widget> dots = [];
-                          if (_.finishedPomodores > 0) {
-                            for (var i = 0; i < _.finishedPomodores; i++) {
-                              dots.add(_buildDot());
-                            }
-                          }
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: dots,
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -109,7 +102,7 @@ Pomodores: ${_.finishedPomodores}""",
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Text(
-              'Neumodore',
+              'title'.tr,
               style:
                   Theme.of(context).textTheme.headline6.copyWith(fontSize: 34),
             ),
@@ -118,7 +111,7 @@ Pomodores: ${_.finishedPomodores}""",
               child: NeumoButton(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 child: Icon(Icons.settings),
-                onPressed: () => Get.toNamed('/settings'),
+                onPressed: () => Get.offAndToNamed('/settings'),
               ),
             )
           ],

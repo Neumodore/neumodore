@@ -1,4 +1,4 @@
-import 'package:neumodore/data/activity/activity.dart';
+import 'package:neumodore/domain/data/activity/activity.dart';
 
 abstract class IPomodoreState {
   List<Activity> get finishedPomodores;

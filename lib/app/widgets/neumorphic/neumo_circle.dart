@@ -58,15 +58,10 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
   AnimationController elevationController;
   double _currElevation = 0.0;
 
-  Timer _drawUpdater;
-
   @override
   void initState() {
     super.initState();
 
-    _drawUpdater = Timer.periodic(Duration(milliseconds: 200), (timer) {
-      setState(() {});
-    });
     initControllers();
 
     widget.controller.progressChangeStream.listen(this.animateTo);
@@ -91,7 +86,6 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
 
   @override
   void dispose() {
-    _drawUpdater.cancel();
     this.fillController.dispose();
     this.elevationController.dispose();
     super.dispose();

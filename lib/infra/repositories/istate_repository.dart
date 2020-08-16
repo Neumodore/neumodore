@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:neumodore/data/app_config/app_config.dart';
-import 'package:neumodore/data/pomodore_state.dart';
+
+import 'package:neumodore/domain/data/pomodore_state.dart';
 
 abstract class IPomodoreRepository {
   Future<void> saveState(PomodoreState state);
@@ -13,10 +13,5 @@ abstract class IThemeRepository {
   ThemeMode themeModeFromIndex(int index);
 }
 
-abstract class IConfigRepository {
-  Future<void> saveConfig(AppConfig state);
-  Future<AppConfig> loadConfig({AppConfig standardValue});
-}
-
 abstract class IApplicationRepository
-    implements IConfigRepository, IThemeRepository, IPomodoreRepository {}
+    implements IThemeRepository, IPomodoreRepository {}

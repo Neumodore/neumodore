@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumodore/infra/managers/pomodore_manager/pomodore_manager.dart';
+import 'package:neumodore/infra/repositories/configuration/configuration_repository.dart';
 import 'package:neumodore/infra/repositories/istate_repository.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:assets_audio_player/assets_audio_player.dart';
@@ -17,8 +18,9 @@ class PomodoreController extends GetxController {
 
   PomodoreController(
     IPomodoreRepository persistenceAdapter,
+    ISettingsRepository settingsRepository,
   ) {
-    stateManager = PomodoreManager(persistenceAdapter);
+    stateManager = PomodoreManager(persistenceAdapter, settingsRepository);
     _timerUpdater = Timer.periodic(Duration(milliseconds: 500), _onTimerUpdate);
   }
 

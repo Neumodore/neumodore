@@ -6,14 +6,15 @@ class NeumoButton extends StatelessWidget {
   final Widget child;
   final EdgeInsets padding;
   final Color backgroundColor;
-
-  const NeumoButton({
-    Key key,
-    this.backgroundColor,
-    this.onPressed,
-    this.padding,
-    this.child,
-  }) : super(key: key);
+  final NeumorphicDecoration decoration;
+  const NeumoButton(
+      {Key key,
+      this.backgroundColor,
+      this.onPressed,
+      this.padding,
+      this.child,
+      this.decoration})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,11 +22,12 @@ class NeumoButton extends StatelessWidget {
       onPressed: onPressed,
       padding: padding ?? EdgeInsets.all(20),
       child: child,
-      decoration: NeumorphicDecoration(
-        color: backgroundColor ?? Theme.of(context).backgroundColor,
-        shape: BoxShape.rectangle,
-        borderRadius: BorderRadius.circular(15),
-      ),
+      decoration: decoration ??
+          NeumorphicDecoration(
+            color: backgroundColor ?? Theme.of(context).backgroundColor,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(15),
+          ),
     );
   }
 }

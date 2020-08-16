@@ -1,6 +1,5 @@
 import 'dart:convert';
-
-import 'package:neumodore/data/interruption.dart';
+import 'package:neumodore/domain/data/interruption.dart';
 
 abstract class Activity {
   String type = 'pomodore';

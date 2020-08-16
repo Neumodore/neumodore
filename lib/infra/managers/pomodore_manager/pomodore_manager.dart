@@ -1,17 +1,19 @@
-import 'package:neumodore/data/activity/activity.dart';
-import 'package:neumodore/data/interruption.dart';
-import 'package:neumodore/data/pomodore_state.dart';
+import 'package:neumodore/domain/data/activity/activity.dart';
+import 'package:neumodore/domain/data/interruption.dart';
+import 'package:neumodore/domain/data/pomodore_state.dart';
+import 'package:neumodore/infra/repositories/configuration/configuration_repository.dart';
 import 'package:neumodore/infra/repositories/istate_repository.dart';
 
 class PomodoreManager {
   IPomodoreRepository _persistenceAdapter;
+  ISettingsRepository _settingsRepository;
   PomodoreState _pomodoreState = PomodoreState(PomodoreActivity());
 
   DateTime _interruptionStartAt;
 
   DateTime _interruptionEndAt;
 
-  PomodoreManager(this._persistenceAdapter) {
+  PomodoreManager(this._persistenceAdapter, this._settingsRepository) {
     _persistenceAdapter.loadState().then((value) {
       _pomodoreState = value;
     });

@@ -1,5 +1,5 @@
-import 'package:neumodore/data/app_config/app_config.dart';
-import 'package:neumodore/data/pomodore_state.dart';
+import 'package:neumodore/domain/data/app_config/app_config.dart';
+import 'package:neumodore/domain/data/pomodore_state.dart';
 import 'package:neumodore/infra/repositories/istate_repository.dart';
 
 class AppStateManager {
@@ -16,12 +16,10 @@ class AppStateManager {
   }
 
   void loadState() async {
-    _configuration = await _persist.loadConfig();
     _neumodoreState = await _persist.loadState();
   }
 
   void saveState() async {
-    await _persist.saveConfig(_configuration);
     await _persist.saveState(_neumodoreState);
   }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/infra/repositories/istate_repository.dart';
-import 'package:neumodore/routes.dart';
 
 class SplashScreenController extends GetxController {
   IThemeRepository themeRepository;
@@ -12,7 +11,6 @@ class SplashScreenController extends GetxController {
 
   @override
   void onInit() async {
-    // TODO: implement onInit
     super.onInit();
 
     Get.changeThemeMode(await themeRepository.loadThemeMode());

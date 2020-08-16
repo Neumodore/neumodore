@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:neumodore/data/activity/activity.dart';
-import 'package:neumodore/data/pomodore_state.dart';
-import 'package:neumodore/data/app_config/app_config.dart';
+import 'package:neumodore/domain/data/activity/activity.dart';
+import 'package:neumodore/domain/data/pomodore_state.dart';
 import 'package:neumodore/infra/repositories/istate_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -10,20 +9,10 @@ const String THEME_STORAGE_KEY = "theme_storage";
 const String STATE_KEY = 'statekey';
 
 class AppStateRepository implements IApplicationRepository {
-  Future<SharedPreferences> _sharedPrefs;
+  SharedPreferences _sharedPrefs;
 
   AppStateRepository(this._sharedPrefs) {
     WidgetsFlutterBinding.ensureInitialized();
-  }
-
-  @override
-  Future<AppConfig> loadConfig({AppConfig standardValue}) async {
-    return AppConfig.fromJson((await _sharedPrefs).getString(CONFIG_KEY));
-  }
-
-  @override
-  Future<bool> saveConfig(AppConfig state) async {
-    return (await _sharedPrefs).setString(CONFIG_KEY, state.toJson());
   }
 
   @override
@@ -36,14 +25,18 @@ class AppStateRepository implements IApplicationRepository {
 
   @override
   Future<ThemeMode> loadThemeMode({ThemeMode standardValue}) async {
-    return themeModeFromIndex(
-      (await _sharedPrefs).getString(THEME_STORAGE_KEY).toString(),
-    );
+    try {
+      return themeModeFromIndex(
+        _sharedPrefs.getString(THEME_STORAGE_KEY).toString(),
+      );
+    } catch (e) {
+      return ThemeMode.system;
+    }
   }
 
   @override
   Future saveThemeMode(ThemeMode mode) async {
-    await (await _sharedPrefs).setString(
+    await _sharedPrefs.setString(
       THEME_STORAGE_KEY,
       mode.index.toString(),
     );
