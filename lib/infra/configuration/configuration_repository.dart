@@ -1,18 +1,18 @@
-import 'package:neumodore/domain/data/app_config/settings_entries.dart';
+import 'package:neumodore/domain/app_config/settings_entries.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract class ISettingsRepository {
   ISettingsRepository(sharedPrefs);
 
-  Future<dynamic> setConfiguration(ConfigurationEntry entry, dynamic newValue);
+  Future<bool> setConfiguration(ConfigurationEntry entry, dynamic newValue);
 
   dynamic getConfiguration(ConfigurationEntry<dynamic> entry);
 }
 
-class ConfigurationRepo implements ISettingsRepository {
+class SettingsRepo implements ISettingsRepository {
   SharedPreferences _sharedPrefs;
 
-  ConfigurationRepo(this._sharedPrefs);
+  SettingsRepo(this._sharedPrefs);
 
   @override
   dynamic getConfiguration(
@@ -22,9 +22,10 @@ class ConfigurationRepo implements ISettingsRepository {
   }
 
   @override
-  Future<dynamic> setConfiguration(
+  Future<bool> setConfiguration(
     ConfigurationEntry entry,
     dynamic newValue,
-  ) =>
-      entry.updateValue(newValue, _sharedPrefs);
+  ) {
+    return entry.updateValue(newValue, _sharedPrefs);
+  }
 }

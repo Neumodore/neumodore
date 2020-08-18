@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import 'package:neumodore/domain/data/app_config/settings_entries.dart';
+import 'package:neumodore/domain/app_config/settings_entries.dart';
 
 class ChangeDurationRequest {
   ConfigurationEntry configEntry;

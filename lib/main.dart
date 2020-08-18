@@ -7,7 +7,6 @@ import 'package:neumodore/themes.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:neumodore/infra/repositories/app_repository.dart';
 
 void main() async {
   // Initialize database
@@ -20,10 +19,6 @@ void main() async {
 }
 
 class NeumodoreApp extends StatelessWidget {
-  final appState = Get.lazyPut<AppStateRepository>(
-    () => AppStateRepository(Get.find()),
-  );
-
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(

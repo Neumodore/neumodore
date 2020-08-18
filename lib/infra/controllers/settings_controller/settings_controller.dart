@@ -1,34 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:neumodore/domain/data/app_config/settings_entries.dart';
+import 'package:neumodore/domain/app_config/settings_entries.dart';
 import 'package:neumodore/domain/usecases/settings/change_duration_request.dart';
 import 'package:neumodore/domain/usecases/settings/decrease_config_duration.dart';
 import 'package:neumodore/domain/usecases/settings/increase_config_duration.dart';
-import 'package:neumodore/infra/repositories/configuration/configuration_repository.dart';
-import 'package:neumodore/infra/repositories/istate_repository.dart';
+import 'package:neumodore/domain/usecases/settings/load_theme_mode_case.dart';
+import 'package:neumodore/domain/usecases/settings/set_theme_mode_case.dart';
+import 'package:neumodore/infra/configuration/configuration_repository.dart';
+import 'package:neumodore/infra/repositories/itheme_repository.dart';
 
 class SettingsController extends GetxController {
-  IApplicationRepository _appRepo;
-  ISettingsRepository _configRepository;
+  ISettingsRepository _settingsRepo;
+  IThemeRepository _themeRepository;
+
+  SetThemeModeUseCase _setThemeModeCase;
+  LoadThemeModeUseCase _loadTheemModeCase;
 
   String get pomodoreInterval =>
-      _fetchConfig(entries.pomodoreDuration)?.inMinutes?.toString() ?? "fail";
+      _fetchConfig(settings.pomodoreDuration)?.inMinutes?.toString() ?? "--";
 
   String get shortBreakInterval =>
-      _fetchConfig(entries.shortBreakDuration)?.inMinutes?.toString() ?? "fail";
+      _fetchConfig(settings.shortBreakDuration)?.inMinutes?.toString() ?? "--";
 
   String get longBreakInterval =>
-      _fetchConfig(entries.longBreakDuration)?.inMinutes?.toString() ?? "fail";
+      _fetchConfig(settings.longBreakDuration)?.inMinutes?.toString() ?? "--";
 
-  ThemeMode _themeMode = ThemeMode.light;
-  ThemeMode get themeMode => _themeMode;
+  ThemeMode get themeMode => _themeRepository.getThemeMode();
+
   set themeMode(ThemeMode val) {
-    _themeMode = val;
+    _themeRepository.setThemeMode(val);
     update();
   }
 
-  SettingsEntries entries = SettingsEntries();
-  SettingsController(this._appRepo, this._configRepository);
+  SettingsEntries settings = SettingsEntries();
+  SettingsController(this._settingsRepo, this._themeRepository) {
+    this._setThemeModeCase = SetThemeModeUseCase(_themeRepository);
+    this._loadTheemModeCase = LoadThemeModeUseCase(_themeRepository);
+  }
 
   @override
   void onInit() async {
@@ -38,7 +46,7 @@ class SettingsController extends GetxController {
 
   Future loadThemeMode() async {
     try {
-      final themeMode = await _appRepo.loadThemeMode();
+      _setThemeModeCase.execute(null);
       Get.changeThemeMode(themeMode);
     } catch (error) {
       print({'[LOAD THEME ERROR]': error});
@@ -47,67 +55,45 @@ class SettingsController extends GetxController {
     }
   }
 
-  void switchTheme() async {
-    ThemeMode curTheme = await _appRepo.loadThemeMode();
-    _appRepo.saveThemeMode(
-      curTheme == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark,
-    );
-    update();
-  }
-
   void setTheme(int val) async {
-    try {
-      await _appRepo.saveThemeMode(_appRepo.themeModeFromIndex(val));
-      Get.changeThemeMode(_appRepo.themeModeFromIndex(val));
-    } catch (e) {
-      print({'[----ERROR]': e});
-    }
+    final themeMode = ThemeMode.values.elementAt(val);
+    _setThemeModeCase.execute(themeMode);
+    Get.changeThemeMode(themeMode);
 
     update();
-  }
-
-  void refreshTheme() async {
-    try {
-      ThemeMode curTheme = await _appRepo.loadThemeMode();
-      Get.changeThemeMode(curTheme);
-    } catch (e) {
-      Get.changeThemeMode(
-        Get.isPlatformDarkMode ? ThemeMode.dark : ThemeMode.light,
-      );
-    }
   }
 
   plusPomodoreDuration(Duration duration) async {
-    await _increaseDuration(entries.pomodoreDuration, duration);
+    await _increaseDuration(settings.pomodoreDuration, duration);
     update();
   }
 
   plusLongBreakDuration(Duration duration) async {
-    await _increaseDuration(entries.longBreakDuration, duration);
+    await _increaseDuration(settings.longBreakDuration, duration);
     update();
   }
 
   plusShortBreakDuration(Duration duration) async {
-    await _increaseDuration(entries.shortBreakDuration, duration);
+    await _increaseDuration(settings.shortBreakDuration, duration);
     update();
   }
 
   minusPomodoreDuration(Duration duration) async {
-    await _decreaseDuration(entries.pomodoreDuration, duration);
+    await _decreaseDuration(settings.pomodoreDuration, duration);
     update();
   }
 
   minusLongBreakDuration(Duration duration) async {
-    await _decreaseDuration(entries.longBreakDuration, duration);
+    await _decreaseDuration(settings.longBreakDuration, duration);
     update();
   }
 
   minusShortBreakDuration(Duration duration) async {
-    await _decreaseDuration(entries.shortBreakDuration, duration);
+    await _decreaseDuration(settings.shortBreakDuration, duration);
     update();
   }
 
-  _fetchConfig(ConfigurationEntry config) => _configRepository.getConfiguration(
+  _fetchConfig(ConfigurationEntry config) => _settingsRepo.getConfiguration(
         config,
       );
 
@@ -115,7 +101,7 @@ class SettingsController extends GetxController {
     ConfigurationEntry config,
     Duration duration,
   ) {
-    return IncreaseConfigDurationCase(_configRepository).execute(
+    return IncreaseConfigDurationCase(_settingsRepo).execute(
       ChangeDurationRequest(
         configuration: config,
         value: duration,
@@ -127,7 +113,7 @@ class SettingsController extends GetxController {
     ConfigurationEntry<Duration> config,
     Duration value,
   ) {
-    DecreaseConfigDurationCase(_configRepository).execute(
+    DecreaseConfigDurationCase(_settingsRepo).execute(
       ChangeDurationRequest(
         configuration: config,
         value: value,

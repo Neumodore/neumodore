@@ -1,11 +1,11 @@
-import 'package:neumodore/domain/data/app_config/settings_entries.dart';
+import 'package:neumodore/domain/app_config/settings_entries.dart';
 import 'package:neumodore/domain/usecases/settings/change_duration_request.dart';
-import 'package:neumodore/infra/repositories/configuration/configuration_repository.dart';
+import 'package:neumodore/infra/configuration/configuration_repository.dart';
 import 'package:neumodore/shared/core/use_case.dart';
 
 class DecreaseConfigDurationCase
-    implements UseCase<ChangeDurationRequest, ConfigurationEntry> {
-  ConfigurationRepo _configRepo;
+    implements UseCase<Future<ConfigurationEntry>, ChangeDurationRequest> {
+  ISettingsRepository _configRepo;
 
   DecreaseConfigDurationCase(this._configRepo);
 

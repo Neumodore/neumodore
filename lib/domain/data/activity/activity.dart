@@ -58,7 +58,7 @@ abstract class Activity {
     this.duration += _duration;
   }
 
-  Activity fromJson(String json) {
+  static Activity fromJSON(String json) {
     final parsed = jsonDecode(json);
     Activity newActivity = PomodoreActivity();
     switch (parsed['type']) {
