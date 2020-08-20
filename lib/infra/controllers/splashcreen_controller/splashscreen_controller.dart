@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:neumodore/infra/repositories/itheme_repository.dart';
+import 'package:neumodore/infra/repositories/theme/itheme_repository.dart';
 
 class SplashScreenController extends GetxController {
   IThemeRepository themeRepository;
@@ -13,9 +13,13 @@ class SplashScreenController extends GetxController {
   void onInit() async {
     super.onInit();
 
-    Get.changeThemeMode(await themeRepository.getThemeMode());
+    Future.delayed(Duration(milliseconds: 10), () {
+      print({"Theme mode setted": themeRepository.getThemeMode()});
+      Get.changeThemeMode(themeRepository.getThemeMode());
+    });
+
     update();
-    Future.delayed(Duration(milliseconds: 1000), () {
+    Future.delayed(Duration(milliseconds: 1500), () {
       Get.offAllNamed("/home");
     });
   }

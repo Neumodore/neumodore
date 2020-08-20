@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 import 'package:neumodore/app/features/home/home_page.dart';
 import 'package:neumodore/app/features/settings/settings_page.dart';
-import 'package:neumodore/infra/controllers/pomodore_controller/pomodore_controller_binding.dart';
+import 'package:neumodore/infra/controllers/session_controller/session_controller_binding.dart';
 import 'package:neumodore/infra/controllers/settings_controller/settings_controler_bindings.dart';
 import 'package:neumodore/infra/controllers/splashcreen_controller/splashscreen_binding.dart';
 
@@ -12,8 +12,8 @@ final routes = [
     name: IntroScreen.name,
     page: () => IntroScreen(),
     bindings: [
-      SplashScreenBinding(),
       SettingsScreenBinding(),
+      SplashScreenBinding(),
     ],
   ),
   //Simple GetPage
@@ -22,7 +22,7 @@ final routes = [
     page: () => HomeScreen(),
     transition: Transition.leftToRight,
     bindings: [
-      PomodoreControllerBinding(),
+      SessionControllerBinding(),
     ],
   ),
   GetPage(

@@ -1,125 +1,155 @@
-import 'dart:convert';
-import 'package:neumodore/domain/data/interruption.dart';
+enum ActivityState { STOPPED, PAUSED, RUNING, COMPLETED }
+enum ActivityType { NONE, POMODORE, SHORT_BREAK, LONG_BREAK }
 
-abstract class Activity {
-  String type = 'pomodore';
-  DateTime startDate;
-  DateTime endDate;
-  Duration interruptionDuration = Duration.zero;
+class Activity {
+  ActivityType type = ActivityType.NONE;
 
-  Duration duration;
+  ActivityState _currentState = ActivityState.STOPPED;
+  ActivityState getState() {
+    if (_currentState == ActivityState.RUNING && isOvertTime) {
+      _currentState = ActivityState.COMPLETED;
+    }
+    return _currentState;
+  }
 
-  Activity(this.duration);
+  DateTime activityStartDate = DateTime.now();
+  DateTime _interruptionStartedAt = DateTime.now();
+  Duration _interruptiontotal = Duration.zero;
+
+  Duration totalDuration = Duration.zero;
+  Duration _defaultDuration;
+
+  Activity({this.totalDuration}) : this._defaultDuration = totalDuration;
 
   Duration get elapsedTime {
-    var durationtotal = Duration.zero;
-    if (endDate != null) {
-      durationtotal = endDate.difference(startDate ?? DateTime.now());
-    } else {
-      durationtotal = DateTime.now().difference(startDate ?? DateTime.now());
+    Duration _total = Duration.zero;
+
+    if (_currentState != ActivityState.STOPPED) {
+      _total = DateTime.now().difference(activityStartDate);
+      if (_currentState == ActivityState.PAUSED) {
+        _total -= DateTime.now().difference(_interruptionStartedAt);
+      }
+      _total -= _interruptiontotal;
     }
-    durationtotal -= interruptionDuration;
-    return durationtotal;
+
+    return _total;
+  }
+
+  bool get isOvertTime {
+    return remainingTime <= Duration.zero;
   }
 
   Duration get remainingTime {
-    var durationtotal = Duration.zero;
-    if (duration.inSeconds > elapsedTime.inSeconds) {
-      durationtotal = Duration(
-        seconds: duration.inSeconds - elapsedTime.inSeconds,
-      );
-    } else {
-      durationtotal = Duration();
+    Duration durationtotal = Duration.zero;
+    if (totalDuration >= elapsedTime) {
+      durationtotal = totalDuration - elapsedTime;
     }
+
     return durationtotal;
   }
 
   double get percentageComplete {
     final percentageCalc =
-        (elapsedTime.inMilliseconds / duration.inMilliseconds);
+        (elapsedTime.inMilliseconds / totalDuration.inMilliseconds);
     return percentageCalc > 1 ? 1 : percentageCalc;
   }
 
   get hasEnded => remainingTime.inMilliseconds <= 0;
 
-  void startActivity() {
-    this.startDate = DateTime.now();
+  void start() {
+    this.activityStartDate = DateTime.now();
+    setState(ActivityState.RUNING);
   }
 
-  void addInterruption(Interruption interruption) {
-    interruptionDuration += interruption.inDuration;
+  void sumInterruption(Duration interruption) {
+    _interruptiontotal += interruption;
   }
 
   void clearInterruptions() {
-    interruptionDuration = Duration.zero;
+    _interruptiontotal = Duration.zero;
+    _interruptionStartedAt = DateTime.fromMillisecondsSinceEpoch(0);
   }
 
   void increaseDuration(Duration _duration) {
-    this.duration += _duration;
+    this.totalDuration += _duration;
   }
 
-  static Activity fromJSON(String json) {
-    final parsed = jsonDecode(json);
-    Activity newActivity = PomodoreActivity();
-    switch (parsed['type']) {
-      case 'pomodore':
-        newActivity = PomodoreActivity(
-          duration: Duration(milliseconds: parsed['duration']),
-        );
-        break;
-      case 'shortbreak':
-        newActivity = ShortBreakActivity(
-          duration: Duration(milliseconds: parsed['duration']),
-        );
-        break;
-      case 'longbreak':
-        newActivity = PomodoreActivity(
-          duration: Duration(milliseconds: parsed['duration']),
-        );
-        break;
+  void reset() {
+    clearInterruptions();
+    setState(ActivityState.STOPPED);
+    totalDuration = _defaultDuration;
+    activityStartDate = DateTime.now();
+  }
+
+  void startInterruption() {
+    if (getState() == ActivityState.RUNING) {
+      _interruptionStartedAt = DateTime.now();
+      setState(ActivityState.PAUSED);
     }
-    return newActivity;
   }
 
-  String toJson() {
-    return jsonEncode(
-      {
-        'type': this.type,
-        'duration': this.duration.inMilliseconds,
-      },
-    );
+  void endInterruption() {
+    if (getState() == ActivityState.PAUSED) {
+      sumInterruption(
+        DateTime.now().difference(_interruptionStartedAt),
+      );
+      setState(ActivityState.RUNING);
+    }
   }
 
-  Activity copyWith({Duration newDuration, String newType}) {
-    this.duration = newDuration ?? this.duration;
-    this.type = newType ?? this.duration;
-    return this;
+  void setState(ActivityState newState) {
+    _currentState = newState;
   }
+
+  Activity.fromJson(Map<String, dynamic> json)
+      : activityStartDate = DateTime.fromMillisecondsSinceEpoch(
+          json['started_at'],
+        ),
+        type = ActivityType.values.elementAt(
+          json['type'],
+        ),
+        totalDuration = Duration(
+          milliseconds: json['duration'],
+        ),
+        _interruptionStartedAt = DateTime.fromMillisecondsSinceEpoch(
+          json['interruption_started_at'] ?? 0,
+        ),
+        _interruptiontotal = Duration(
+          milliseconds: json['interruption_total'] ?? 0,
+        ),
+        _currentState = ActivityState.values.elementAt(
+          json['current_state'] ?? 0,
+        );
+
+  /// Returns a New activity from given json string.
+  Map<String, dynamic> toJson() => {
+        'type': type.index,
+        'duration': totalDuration.inMilliseconds,
+        'interruption_started_at':
+            _interruptionStartedAt.millisecondsSinceEpoch,
+        'interruption_total': _interruptiontotal.inMilliseconds,
+        'current_state': getState().index,
+        'started_at': activityStartDate.millisecondsSinceEpoch,
+      };
 }
 
 class PomodoreActivity extends Activity {
+  @override
+  ActivityType type = ActivityType.POMODORE;
   PomodoreActivity({Duration duration})
-      : super(
-          duration ?? Duration(minutes: 25),
-        ) {
-    this.type = 'pomodore';
-  }
+      : super(totalDuration: duration ?? Duration(minutes: 25));
 }
 
 class ShortBreakActivity extends Activity {
+  @override
+  ActivityType type = ActivityType.SHORT_BREAK;
   ShortBreakActivity({Duration duration})
-      : super(
-          duration ?? Duration(minutes: 5),
-        ) {
-    this.type = 'shortbreak';
-  }
+      : super(totalDuration: duration ?? Duration(minutes: 5));
 }
 
 class LongBreakActivity extends Activity {
+  @override
+  ActivityType type = ActivityType.LONG_BREAK;
   LongBreakActivity({Duration duration})
-      : super(
-          duration ?? Duration(minutes: 15),
-        ) {
-    this.type = 'longbreak';
-  }
+      : super(totalDuration: duration ?? Duration(minutes: 15));
 }

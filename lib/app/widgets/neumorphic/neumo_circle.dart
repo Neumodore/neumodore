@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:clay_containers/clay_containers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -58,13 +59,15 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
   AnimationController elevationController;
   double _currElevation = 0.0;
 
+  StreamSubscription<ProgressRequest> subscription;
+
   @override
   void initState() {
     super.initState();
 
     initControllers();
 
-    widget.controller.progressChangeStream.listen(this.animateTo);
+    subscription = widget.controller.progressChangeStream.listen(animateTo);
     widget.controller.animateTo(widget.initialValue);
 
     elevationController.animateTo(
@@ -75,19 +78,22 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
   }
 
   void animateTo(ProgressRequest value) {
-    setState(() {
-      fillController.animateTo(
-        value.value,
-        curve: value.curve ?? widget.defaultCurve,
-        duration: value.duration ?? widget.defaultDuration,
-      );
-    });
+    if (this != null) {
+      setState(() {
+        fillController?.animateTo(
+          value.value,
+          curve: value.curve ?? widget.defaultCurve,
+          duration: value.duration ?? widget.defaultDuration,
+        );
+      });
+    }
   }
 
   @override
   void dispose() {
-    this.fillController.dispose();
-    this.elevationController.dispose();
+    fillController?.dispose();
+    elevationController?.dispose();
+    subscription.cancel();
     super.dispose();
   }
 
@@ -137,6 +143,17 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
       width: 200,
       child: Stack(
         children: <Widget>[
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: ClayContainer(
+                color: Theme.of(context).backgroundColor,
+                borderRadius: 100,
+                depth: (_currElevation * 30).toInt(),
+                curveType: CurveType.convex,
+              ),
+            ),
+          ),
           CustomPaint(
             child: Center(
               child: widget.child,

@@ -1,16 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:neumodore/infra/controllers/pomodore_controller/pomodore_controller.dart';
+import 'package:neumodore/domain/data/activity/activity.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_button.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
+import 'package:neumodore/infra/controllers/session_controller/session_controller.dart';
 
 class HomeScreen extends StatelessWidget {
   static String name = '/home';
   final neuProgressEndColor = Colors.redAccent;
   final neuProgressStartColor = Colors.greenAccent;
 
-  final PomodoreController _homePageCtrl = Get.find();
+  final SessionController _homePageCtrl = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -29,11 +30,13 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            GetBuilder<PomodoreController>(
+            GetBuilder<SessionController>(
                 builder: (_) => Text(
                       """Duration
 ${_.durationOSD}
-Pomodores: ${_.finishedPomodores}""",
+Pomodores: ${_.finishedPomodores}
+State: ${_.currentState().toString()}
+Type: ${_.session.currentActivity.type.toString()}""",
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.headline6,
                     )),
@@ -44,7 +47,7 @@ Pomodores: ${_.finishedPomodores}""",
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 NeuProgressCircle(
-                  child: GetBuilder<PomodoreController>(
+                  child: GetBuilder<SessionController>(
                     builder: (_) {
                       return Text(
                         '${_.timerOSD}',
@@ -61,8 +64,8 @@ Pomodores: ${_.finishedPomodores}""",
                 ),
               ],
             ),
-            GetBuilder<PomodoreController>(builder: (_) {
-              return _buildControlls(_.getState());
+            GetBuilder<SessionController>(builder: (_) {
+              return _buildControlls(_.currentState());
             }),
             Padding(
               padding: const EdgeInsets.only(top: 30.0),
@@ -71,18 +74,20 @@ Pomodores: ${_.finishedPomodores}""",
                   Expanded(
                     child: Container(
                       height: 50,
-                      child: GetBuilder<PomodoreController>(builder: (_) {
-                        List<Widget> dots = [];
-                        if (_.finishedPomodores > 0) {
-                          for (var i = 0; i < _.finishedPomodores; i++) {
-                            dots.add(_buildDot());
+                      child: GetBuilder<SessionController>(
+                        builder: (_) {
+                          List<Widget> dots = [];
+                          if (_.finishedPomodores > 0) {
+                            for (var i = 0; i < _.finishedPomodores; i++) {
+                              dots.add(_buildDot());
+                            }
                           }
-                        }
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: dots,
-                        );
-                      }),
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: dots,
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ],
@@ -146,18 +151,18 @@ Pomodores: ${_.finishedPomodores}""",
     );
   }
 
-  Widget _buildControlls(ControllerState state) {
+  Widget _buildControlls(ActivityState state) {
     switch (state) {
-      case ControllerState.PAUSED:
+      case ActivityState.PAUSED:
         return _buildPausedControlls();
         break;
-      case ControllerState.RUNING:
+      case ActivityState.RUNING:
         return _buildPlayingControlls();
         break;
-      case ControllerState.STOPPED:
+      case ActivityState.STOPPED:
         return _buildStoppedControlls();
         break;
-      case ControllerState.COMPLETED:
+      case ActivityState.COMPLETED:
         return _buildStoppedControlls();
         break;
     }
@@ -172,7 +177,7 @@ Pomodores: ${_.finishedPomodores}""",
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
             onPressed: () async {
-              _homePageCtrl.startPomodore();
+              _homePageCtrl.startActivity();
             },
             padding: EdgeInsets.all(20),
             child: Icon(Icons.play_arrow),
@@ -200,7 +205,7 @@ Pomodores: ${_.finishedPomodores}""",
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
             onPressed: () {
-              _homePageCtrl.stopPomodore();
+              _homePageCtrl.stopSession();
             },
             child: Icon(Icons.stop),
           ),
@@ -209,7 +214,7 @@ Pomodores: ${_.finishedPomodores}""",
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
             onPressed: () async {
-              _homePageCtrl.pausePomodore();
+              _homePageCtrl.pauseActivity();
             },
             padding: EdgeInsets.all(20),
             child: Icon(Icons.pause),
@@ -219,7 +224,7 @@ Pomodores: ${_.finishedPomodores}""",
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
             onPressed: () async {
-              _homePageCtrl.addOneMinute();
+              _homePageCtrl.increaseDuration();
             },
             padding: EdgeInsets.all(20),
             child: Icon(Icons.exposure_plus_1),
@@ -247,7 +252,7 @@ Pomodores: ${_.finishedPomodores}""",
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
             onPressed: () {
-              _homePageCtrl.stopPomodore();
+              _homePageCtrl.stopSession();
             },
             child: Icon(Icons.stop),
           ),
@@ -256,7 +261,7 @@ Pomodores: ${_.finishedPomodores}""",
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
             onPressed: () async {
-              _homePageCtrl.resumePomodore();
+              _homePageCtrl.resumeActivity();
             },
             padding: EdgeInsets.all(20),
             child: Icon(Icons.play_arrow),
@@ -266,7 +271,7 @@ Pomodores: ${_.finishedPomodores}""",
           padding: EdgeInsets.only(top: 50),
           child: NeumoButton(
             onPressed: () async {
-              _homePageCtrl.addOneMinute();
+              _homePageCtrl.increaseDuration();
             },
             padding: EdgeInsets.all(20),
             child: Icon(Icons.exposure_plus_1),

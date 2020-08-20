@@ -7,11 +7,23 @@ class AppConfig {
   Duration shortBreakDuration = Duration(minutes: 5);
   Duration longBreakDuration = Duration(minutes: 15);
 
-  AppConfig.fromJson(String string) {
+  AppConfig fromJson(String string) {
+    var appConfig = new AppConfig();
+
     final parsed = jsonDecode(string);
-    this.longBreakDuration = Duration(milliseconds: parsed['long_break']);
-    this.shortBreakDuration = Duration(milliseconds: parsed['short_break']);
-    this.pomodoreDuration = Duration(milliseconds: parsed['pomodore_duration']);
+
+    appConfig.longBreakDuration = Duration(
+      milliseconds: parsed['long_break'],
+    );
+
+    appConfig.shortBreakDuration = Duration(
+      milliseconds: parsed['short_break'],
+    );
+
+    appConfig.pomodoreDuration = Duration(
+      milliseconds: parsed['pomodore_duration'],
+    );
+    return appConfig;
   }
 
   String toJson() {

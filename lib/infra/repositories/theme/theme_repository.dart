@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:neumodore/domain/app_config/settings_entries.dart';
 import 'package:neumodore/infra/configuration/configuration_repository.dart';
-import 'package:neumodore/infra/repositories/itheme_repository.dart';
+import 'package:neumodore/infra/repositories/theme/itheme_repository.dart';
 
 class ThemeRepository implements IThemeRepository {
   final themeModeSettings = ConfigurationEntry<ThemeMode>(

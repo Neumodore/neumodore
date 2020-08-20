@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:neumodore/infra/repositories/itheme_repository.dart';
+import 'package:neumodore/infra/repositories/theme/itheme_repository.dart';
 import 'package:neumodore/shared/core/use_case.dart';
 
 class SetThemeModeUseCase implements UseCase<Future<ThemeMode>, ThemeMode> {

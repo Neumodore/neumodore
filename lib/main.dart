@@ -57,7 +57,7 @@ class NeumodoreTranslations extends Translations {
           'pomodore_duration': 'Pomodore minutes',
           'shortbreak_duration': 'Shortbreak minutes',
           'longbreak_duration': 'Longbreak minutes',
-          'appearence_section': 'Aparência',
+          'appearence_section': 'Appearence',
         },
         'pt_BR': {
           'title': 'Neumodoro',

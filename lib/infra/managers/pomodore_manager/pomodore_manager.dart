@@ -1,21 +1,14 @@
 import 'package:neumodore/domain/data/activity/activity.dart';
-import 'package:neumodore/domain/data/interruption.dart';
 import 'package:neumodore/domain/data/pomodore_state.dart';
-import 'package:neumodore/infra/configuration/configuration_repository.dart';
-import 'package:neumodore/infra/repositories/iactivity_repo.dart';
 
 class PomodoreManager {
-  IActivityRepository _persistenceAdapter;
-
-  ISettingsRepository _settingsRepository;
-
   PomodoreState _pomodoreState = PomodoreState(PomodoreActivity());
 
   DateTime _interruptionStartAt;
 
   DateTime _interruptionEndAt;
 
-  PomodoreManager(this._persistenceAdapter, this._settingsRepository);
+  PomodoreManager();
 
   List<Activity> get finishedActivities => _pomodoreState.finishedActivities;
 
@@ -48,7 +41,7 @@ class PomodoreManager {
   }
 
   void startActivity() {
-    currentActivitiy.startDate = DateTime.now();
+    currentActivitiy.start();
   }
 
   int get pomodoreCount => finishedActivities
@@ -90,8 +83,8 @@ class PomodoreManager {
   void endInterruption() {
     _interruptionEndAt = DateTime.now();
 
-    currentActivitiy.addInterruption(Interruption()
-      ..startDate = _interruptionStartAt
-      ..endDate = _interruptionEndAt);
+    currentActivitiy.sumInterruption(
+      _interruptionEndAt.difference(_interruptionStartAt),
+    );
   }
 }

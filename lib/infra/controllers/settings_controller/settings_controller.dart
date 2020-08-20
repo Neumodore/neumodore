@@ -7,14 +7,20 @@ import 'package:neumodore/domain/usecases/settings/increase_config_duration.dart
 import 'package:neumodore/domain/usecases/settings/load_theme_mode_case.dart';
 import 'package:neumodore/domain/usecases/settings/set_theme_mode_case.dart';
 import 'package:neumodore/infra/configuration/configuration_repository.dart';
-import 'package:neumodore/infra/repositories/itheme_repository.dart';
+import 'package:neumodore/infra/repositories/theme/itheme_repository.dart';
 
 class SettingsController extends GetxController {
-  ISettingsRepository _settingsRepo;
-  IThemeRepository _themeRepository;
+  final ISettingsRepository _settingsRepo;
+  final IThemeRepository _themeRepository;
 
-  SetThemeModeUseCase _setThemeModeCase;
-  LoadThemeModeUseCase _loadTheemModeCase;
+  final SetThemeModeUseCase _setThemeModeCase;
+  final LoadThemeModeUseCase _loadThemeModeCase;
+
+  final SettingsEntries settings = SettingsEntries();
+
+  SettingsController(this._settingsRepo, this._themeRepository)
+      : this._setThemeModeCase = SetThemeModeUseCase(_themeRepository),
+        this._loadThemeModeCase = LoadThemeModeUseCase(_themeRepository);
 
   String get pomodoreInterval =>
       _fetchConfig(settings.pomodoreDuration)?.inMinutes?.toString() ?? "--";
@@ -25,33 +31,26 @@ class SettingsController extends GetxController {
   String get longBreakInterval =>
       _fetchConfig(settings.longBreakDuration)?.inMinutes?.toString() ?? "--";
 
-  ThemeMode get themeMode => _themeRepository.getThemeMode();
+  ThemeMode get themeMode => _loadThemeModeCase.execute(ThemeMode.system);
 
   set themeMode(ThemeMode val) {
-    _themeRepository.setThemeMode(val);
+    _setThemeModeCase.execute(val);
     update();
-  }
-
-  SettingsEntries settings = SettingsEntries();
-  SettingsController(this._settingsRepo, this._themeRepository) {
-    this._setThemeModeCase = SetThemeModeUseCase(_themeRepository);
-    this._loadTheemModeCase = LoadThemeModeUseCase(_themeRepository);
   }
 
   @override
   void onInit() async {
     super.onInit();
-    await loadThemeMode();
   }
 
   Future loadThemeMode() async {
     try {
-      _setThemeModeCase.execute(null);
-      Get.changeThemeMode(themeMode);
+      Get.changeThemeMode(this.themeMode);
     } catch (error) {
       print({'[LOAD THEME ERROR]': error});
       Get.changeThemeMode(
-          Get.isPlatformDarkMode ? ThemeMode.dark : ThemeMode.light);
+        Get.isPlatformDarkMode ? ThemeMode.dark : ThemeMode.light,
+      );
     }
   }
 
