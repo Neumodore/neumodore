@@ -11,25 +11,26 @@ class NeumodoreThemes {
 
   static ThemeData light() {
     final lightGreyBackgroundColor = Color(0xFFefeeee);
+    final textColorGrey = Colors.grey;
     return ThemeData.light().copyWith(
       platform: TargetPlatform.iOS,
       accentColor: Colors.grey,
       colorScheme: ColorScheme.light(),
       backgroundColor: lightGreyBackgroundColor,
       scaffoldBackgroundColor: lightGreyBackgroundColor,
-      dialogBackgroundColor: Colors.grey[300],
+      dialogBackgroundColor: lightGreyBackgroundColor,
       appBarTheme: AppBarTheme(
         brightness: Brightness.light,
         color: lightGreyBackgroundColor,
         textTheme: TextTheme(
           headline6: TextStyle(
-            color: Colors.black,
+            color: textColorGrey,
             fontSize: 20,
             fontWeight: FontWeight.w500,
           ),
         ),
         iconTheme: IconThemeData(
-          color: Colors.black,
+          color: textColorGrey,
         ),
       ),
     );

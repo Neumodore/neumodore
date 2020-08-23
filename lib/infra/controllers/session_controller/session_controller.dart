@@ -200,4 +200,8 @@ class SessionController extends GetxController {
   void animateTo(double d) {
     neuProgressController.animateTo(d);
   }
+
+  void goToSettings() {
+    Get.offAndToNamed('/settings');
+  }
 }

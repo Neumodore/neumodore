@@ -57,7 +57,6 @@ class LocalReminderService {
           vibrationPattern: vibrationPattern,
           enableVibration: true,
           playSound: true,
-          largeIcon: DrawableResourceAndroidBitmap(iconResName),
           icon: iconResName,
           color: iconColor,
           showWhen: showWhenStamp,

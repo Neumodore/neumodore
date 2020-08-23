@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import 'emboss_circle_painter.dart';
 import 'progress_circle_painter.dart';
 
 class NeuProgressCircle extends StatefulWidget {
@@ -53,11 +52,15 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
     with TickerProviderStateMixin {
   double _currPercent = 0.0;
 
-  Color _currColor;
+  Color _filledColor;
   AnimationController fillController;
 
-  AnimationController elevationController;
-  double _currElevation = 0.0;
+  AnimationController fillColorController;
+  double _embossAnimation = 0.0;
+  AnimationController embossController;
+  double _fillAnimation = 0.0;
+  AnimationController thicknessController;
+  double _thicknessAnimation = 0.0;
 
   StreamSubscription<ProgressRequest> subscription;
 
@@ -69,12 +72,6 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
 
     subscription = widget.controller.progressChangeStream.listen(animateTo);
     widget.controller.animateTo(widget.initialValue);
-
-    elevationController.animateTo(
-      1,
-      curve: widget.introDefaultCurve,
-      duration: widget.introDuration,
-    );
   }
 
   void animateTo(ProgressRequest value) {
@@ -92,15 +89,17 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
   @override
   void dispose() {
     fillController?.dispose();
-    elevationController?.dispose();
+    fillColorController?.dispose();
+    thicknessController?.dispose();
+    embossController?.dispose();
     subscription.cancel();
     super.dispose();
   }
 
-  void initControllers() {
-    _currColor = widget.initialColor;
+  void initControllers() async {
+    _filledColor = widget.initialColor;
 
-    elevationController = AnimationController(
+    fillColorController = AnimationController(
       vsync: this,
       animationBehavior: AnimationBehavior.normal,
       lowerBound: 0,
@@ -108,20 +107,47 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
       duration: Duration(seconds: 5),
     )..addListener(() {
         setState(() {
-          _currElevation = lerpDouble(
+          _fillAnimation = lerpDouble(
             0,
             1,
-            elevationController.value,
+            fillColorController.value,
+          );
+        });
+      });
+
+    embossController = AnimationController(
+      vsync: this,
+      animationBehavior: AnimationBehavior.normal,
+      duration: Duration(seconds: 3),
+    )..addListener(() {
+        setState(() {
+          _embossAnimation = lerpDouble(
+            0,
+            1,
+            embossController.value,
+          );
+        });
+      });
+
+    thicknessController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 1),
+    )..addListener(() {
+        setState(() {
+          _thicknessAnimation = lerpDouble(
+            0,
+            1,
+            thicknessController.value,
           );
         });
       });
 
     fillController = AnimationController(
       vsync: this,
-      duration: widget.defaultDuration,
+      duration: Duration(seconds: 2),
     )..addListener(() {
         setState(() {
-          _currColor = Color.lerp(
+          _filledColor = Color.lerp(
             widget.initialColor,
             widget.finalColor,
             fillController.value,
@@ -133,65 +159,92 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
           );
         });
       });
+    fillColorController.animateTo(
+      .01,
+      curve: widget.introDefaultCurve,
+      duration: widget.introDuration,
+    );
+    embossController.animateTo(
+      1,
+      curve: widget.introDefaultCurve,
+      duration: widget.introDuration,
+    )..whenComplete(() => thicknessController.animateTo(
+          1,
+          curve: widget.introDefaultCurve,
+          duration: widget.introDuration,
+        )..whenComplete(() => fillColorController.animateTo(
+              1,
+              curve: widget.introDefaultCurve,
+              duration: widget.introDuration,
+            )));
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: EdgeInsets.all(15),
       height: 200,
       width: 200,
       child: Stack(
         children: <Widget>[
           Center(
             child: Padding(
+              padding: const EdgeInsets.all(0.0),
+              child: ClayContainer(
+                color: Theme.of(context).backgroundColor,
+                borderRadius: 100,
+                depth: (_embossAnimation * 10).toInt(),
+                spread: 5,
+                emboss: true,
+                curveType: CurveType.concave,
+              ),
+            ),
+          ),
+          Center(
+            child: Padding(
               padding: const EdgeInsets.all(30.0),
               child: ClayContainer(
                 color: Theme.of(context).backgroundColor,
                 borderRadius: 100,
-                depth: (_currElevation * 10).toInt(),
+                depth: (_embossAnimation * 10).toInt(),
                 spread: 10,
                 emboss: false,
                 curveType: CurveType.concave,
               ),
             ),
           ),
-          CustomPaint(
+          Opacity(
+            opacity: _thicknessAnimation * 1,
             child: Center(
               child: widget.child,
             ),
-            painter: EmbossCirclePainter(
-              100,
-              backgroundColor:
-                  widget.backgroundColor ?? Theme.of(context).backgroundColor,
-              thickness: 9,
-              width: 20,
-              embossHeight: _currElevation,
-            ),
           ),
           _buildColorFill(),
-          buildGlowFX()
+          _buildGlowFX()
         ],
       ),
     );
   }
 
-  Widget buildGlowFX() {
+  Widget _buildGlowFX() {
     return ImageFiltered(
       imageFilter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
       child: _buildColorFill(),
     );
   }
 
-  CustomPaint _buildColorFill() {
-    return CustomPaint(
-      isComplex: true,
-      child: Column(children: <Widget>[Row()]),
-      foregroundPainter: ProgressCirclePainter(
-        fillColor: _currColor,
-        filledPercentage: _currPercent,
-        thickness: _currElevation * 25,
-        width: 20,
+  Widget _buildColorFill() {
+    return Container(
+      padding: EdgeInsets.all(15),
+      child: CustomPaint(
+        isComplex: true,
+        child: Column(children: <Widget>[Row()]),
+        foregroundPainter: ProgressCirclePainter(
+          fillColor: _filledColor,
+          filledPercentage: _fillAnimation * _currPercent,
+          thickness: _thicknessAnimation * 25,
+          width: 20,
+        ),
       ),
     );
   }

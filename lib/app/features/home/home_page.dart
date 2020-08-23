@@ -3,8 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:neumodore/app/widgets/neumorphic/animated_neumo_button.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
-import 'package:neumodore/app/widgets/neumorphic/neumo_button.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumodore/infra/controllers/session_controller/session_controller.dart';
 
@@ -42,8 +42,10 @@ class HomeScreen extends StatelessWidget {
                 NeuProgressCircle(
                   child: GetBuilder<SessionController>(
                     builder: (_) {
-                      return Text(
+                      return ClayText(
                         '${_.timerOSD}',
+                        emboss: true,
+                        depth: 40,
                         style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
@@ -64,17 +66,17 @@ class HomeScreen extends StatelessWidget {
             SizedBox(
               height: 50,
             ),
-            GetBuilder<SessionController>(
-              builder: (_) => Text(
-                """Duration
-${_.durationOSD}
-Pomodores: ${_.finishedPomodores}
-State: ${_.currentState.toString()}
-Type: ${_.session.currentActivity.type.toString()}""",
-                textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.headline6,
-              ),
-            ),
+//             GetBuilder<SessionController>(
+//               builder: (_) => Text(
+//                 """Duration
+// ${_.durationOSD}
+// Pomodores: ${_.finishedPomodores}
+// State: ${_.currentState.toString()}
+// Type: ${_.session.currentActivity.type.toString()}""",
+//                 textAlign: TextAlign.center,
+//                 style: Theme.of(context).textTheme.headline6,
+//               ),
+//             ),
           ],
         ),
       ),
@@ -120,7 +122,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
     double percentageComplete,
   ) {
     return Padding(
-      padding: const EdgeInsets.all(5.0),
+      padding: const EdgeInsets.all(8.0),
       child: ClayContainer(
         width: 20,
         height: 20,
@@ -130,38 +132,26 @@ Type: ${_.session.currentActivity.type.toString()}""",
         depth: 30,
         color: Theme.of(context).backgroundColor,
         child: currentDot < finishedPomodores
-            ? _buildDot(currentDot < finishedPomodores
+            ? _buildDot(currentDot == finishedPomodores && finishedPomodores > 0
                 ? [
-                    Colors.redAccent[100],
-                    Colors.redAccent,
+                    Color.lerp(
+                      Colors.orangeAccent[100],
+                      Colors.redAccent[100],
+                      percentageComplete,
+                    ),
+                    Color.lerp(
+                      Colors.orangeAccent,
+                      Colors.redAccent,
+                      percentageComplete,
+                    ),
+                    Get.theme.backgroundColor.withOpacity(0)
                   ]
                 : [
                     Colors.redAccent[100],
                     Colors.redAccent,
                     Get.theme.backgroundColor.withOpacity(0)
                   ])
-            : currentDot == finishedPomodores && finishedPomodores > 0
-                ? _buildDot(
-                    currentDot == finishedPomodores && finishedPomodores > 0
-                        ? [
-                            Color.lerp(
-                              Colors.orangeAccent[100],
-                              Colors.redAccent[100],
-                              percentageComplete,
-                            ),
-                            Color.lerp(
-                              Colors.orangeAccent,
-                              Colors.redAccent,
-                              percentageComplete,
-                            ),
-                            Get.theme.backgroundColor.withOpacity(0)
-                          ]
-                        : [
-                            Colors.redAccent[100],
-                            Colors.redAccent,
-                            Get.theme.backgroundColor.withOpacity(0)
-                          ])
-                : SizedBox(),
+            : SizedBox(),
       ),
     );
   }
@@ -180,10 +170,10 @@ Type: ${_.session.currentActivity.type.toString()}""",
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: NeumoButton(
+              child: FadedNeumoButton(
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                 child: Icon(Icons.settings),
-                onPressed: () => Get.offAndToNamed('/settings'),
+                onPressed: _homePageCtrl.goToSettings,
               ),
             )
           ],
@@ -200,8 +190,8 @@ Type: ${_.session.currentActivity.type.toString()}""",
       builder: (ctx, val, child) => Opacity(
           opacity: val,
           child: Container(
-            width: val * 30,
-            height: val * 30,
+            width: 50,
+            height: 50,
             decoration: BoxDecoration(
               gradient: RadialGradient(
                 colors: colors,
@@ -238,7 +228,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
       children: <Widget>[
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeumoButton(
+          child: FadedNeumoButton(
             onPressed: () async {
               _homePageCtrl.startActivity();
             },
@@ -248,7 +238,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
         ),
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeumoButton(
+          child: FadedNeumoButton(
             onPressed: () async {
               _homePageCtrl.skipActivity();
             },
@@ -266,7 +256,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
       children: <Widget>[
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeumoButton(
+          child: FadedNeumoButton(
             onPressed: () {
               _homePageCtrl.stopSession();
             },
@@ -275,7 +265,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
         ),
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeumoButton(
+          child: FadedNeumoButton(
             onPressed: () async {
               _homePageCtrl.pauseActivity();
             },
@@ -285,7 +275,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
         ),
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeumoButton(
+          child: FadedNeumoButton(
             onPressed: () async {
               _homePageCtrl.increaseDuration();
             },
@@ -295,7 +285,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
         ),
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeumoButton(
+          child: FadedNeumoButton(
             onPressed: () async {
               _homePageCtrl.skipActivity();
             },
@@ -313,7 +303,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
       children: <Widget>[
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeumoButton(
+          child: FadedNeumoButton(
             onPressed: () {
               _homePageCtrl.stopSession();
             },
@@ -322,7 +312,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
         ),
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeumoButton(
+          child: FadedNeumoButton(
             onPressed: () async {
               _homePageCtrl.resumeActivity();
             },
@@ -332,7 +322,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
         ),
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeumoButton(
+          child: FadedNeumoButton(
             onPressed: () async {
               _homePageCtrl.increaseDuration();
             },
@@ -342,7 +332,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
         ),
         Container(
           padding: EdgeInsets.only(top: 50),
-          child: NeumoButton(
+          child: FadedNeumoButton(
             onPressed: () async {
               _homePageCtrl.skipActivity();
             },
