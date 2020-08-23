@@ -9,10 +9,8 @@ class StopPomodoreSessionCase implements UseCase {
   @override
   Future<PomodoreSession> execute(dynamic argument) async {
     final PomodoreSession session = _sessionRepository.loadSession();
-
     session.resetSession();
-
-    _sessionRepository.saveSession(session);
+    await _sessionRepository.saveSession(session);
     return session;
   }
 }

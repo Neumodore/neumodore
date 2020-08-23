@@ -12,7 +12,7 @@ class IncreaseActivityDurationCase
   Future<PomodoreSession> execute(Duration durationToBeIncreased) async {
     final session = _sessionRepository.loadSession();
     session.increaseDuration(durationToBeIncreased);
-    _sessionRepository.saveSession(session);
+    await _sessionRepository.saveSession(session);
     return session;
   }
 }
