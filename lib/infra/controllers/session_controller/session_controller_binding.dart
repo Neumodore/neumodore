@@ -1,3 +1,4 @@
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
 import 'package:neumodore/domain/data/session/session_settings.dart';
@@ -10,6 +11,7 @@ import 'package:neumodore/infra/repositories/theme/itheme_repository.dart';
 import 'package:neumodore/infra/repositories/theme/theme_repository.dart';
 import 'package:neumodore/infra/services/audio/audio_service_concrete.dart';
 import 'package:neumodore/infra/services/audio/iaudio_service.dart';
+import 'package:neumodore/infra/services/local_reminder_service.dart';
 import 'package:neumodore/infra/services/screen/iscreen_service.dart';
 import 'package:neumodore/infra/services/screen/screen_service_concrete.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -56,12 +58,22 @@ class SessionControllerBinding extends Bindings {
       ),
     );
 
+    Get.put<FlutterLocalNotificationsPlugin>(
+      FlutterLocalNotificationsPlugin(),
+    );
+
+    Get.put<LocalReminderService>(
+      LocalReminderService(
+        Get.find<FlutterLocalNotificationsPlugin>(),
+      ),
+    );
+
     Get.put<SessionController>(
       SessionController(
         Get.find<ISessionRepository>(),
         Get.find<ISettingsRepository>(),
-        Get.find<IAudioService>(),
         Get.find<IScreenService>(),
+        Get.find<LocalReminderService>(),
       ),
       permanent: true,
     );

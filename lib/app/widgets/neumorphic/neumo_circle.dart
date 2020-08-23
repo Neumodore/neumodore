@@ -149,8 +149,10 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
               child: ClayContainer(
                 color: Theme.of(context).backgroundColor,
                 borderRadius: 100,
-                depth: (_currElevation * 30).toInt(),
-                curveType: CurveType.convex,
+                depth: (_currElevation * 10).toInt(),
+                spread: 10,
+                emboss: false,
+                curveType: CurveType.concave,
               ),
             ),
           ),

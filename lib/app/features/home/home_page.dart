@@ -1,5 +1,7 @@
+import 'package:clay_containers/clay_containers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_button.dart';
@@ -30,16 +32,7 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            GetBuilder<SessionController>(
-                builder: (_) => Text(
-                      """Duration
-${_.durationOSD}
-Pomodores: ${_.finishedPomodores}
-State: ${_.currentState().toString()}
-Type: ${_.session.currentActivity.type.toString()}""",
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.headline6,
-                    )),
+            _buildDotIndicator(context),
             SizedBox(
               height: Get.mediaQuery.size.height * 0.05,
             ),
@@ -52,49 +45,123 @@ Type: ${_.session.currentActivity.type.toString()}""",
                       return Text(
                         '${_.timerOSD}',
                         style: TextStyle(
-                          fontSize: 24,
-                        ),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).textTheme.button.color),
                       );
                     },
                   ),
                   initialValue: 0.01,
                   defaultDuration: Duration(seconds: 4),
-                  defaultCurve: Curves.easeOutQuart,
+                  defaultCurve: Curves.easeOutCirc,
                   controller: _homePageCtrl.neuProgressController,
                 ),
               ],
             ),
             GetBuilder<SessionController>(builder: (_) {
-              return _buildControlls(_.currentState());
+              return _buildControlls(_.currentState);
             }),
-            Padding(
-              padding: const EdgeInsets.only(top: 30.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      height: 50,
-                      child: GetBuilder<SessionController>(
-                        builder: (_) {
-                          List<Widget> dots = [];
-                          if (_.finishedPomodores > 0) {
-                            for (var i = 0; i < _.finishedPomodores; i++) {
-                              dots.add(_buildDot());
-                            }
-                          }
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: dots,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ],
+            SizedBox(
+              height: 50,
+            ),
+            GetBuilder<SessionController>(
+              builder: (_) => Text(
+                """Duration
+${_.durationOSD}
+Pomodores: ${_.finishedPomodores}
+State: ${_.currentState.toString()}
+Type: ${_.session.currentActivity.type.toString()}""",
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headline6,
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Padding _buildDotIndicator(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 30.0),
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            child: Container(
+              height: 50,
+              child: GetBuilder<SessionController>(
+                builder: (_) {
+                  List<Widget> dots = [];
+                  for (var currentDot = 0; currentDot < 4; currentDot++) {
+                    dots.add(_buildLight(
+                      context,
+                      currentDot,
+                      _.finishedPomodores,
+                      _.progressPercentage,
+                    ));
+                  }
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: dots,
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Padding _buildLight(
+    BuildContext context,
+    int currentDot,
+    int finishedPomodores,
+    double percentageComplete,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.all(5.0),
+      child: ClayContainer(
+        width: 20,
+        height: 20,
+        emboss: true,
+        spread: 2,
+        borderRadius: 100,
+        depth: 30,
+        color: Theme.of(context).backgroundColor,
+        child: currentDot < finishedPomodores
+            ? _buildDot(currentDot < finishedPomodores
+                ? [
+                    Colors.redAccent[100],
+                    Colors.redAccent,
+                  ]
+                : [
+                    Colors.redAccent[100],
+                    Colors.redAccent,
+                    Get.theme.backgroundColor.withOpacity(0)
+                  ])
+            : currentDot == finishedPomodores && finishedPomodores > 0
+                ? _buildDot(
+                    currentDot == finishedPomodores && finishedPomodores > 0
+                        ? [
+                            Color.lerp(
+                              Colors.orangeAccent[100],
+                              Colors.redAccent[100],
+                              percentageComplete,
+                            ),
+                            Color.lerp(
+                              Colors.orangeAccent,
+                              Colors.redAccent,
+                              percentageComplete,
+                            ),
+                            Get.theme.backgroundColor.withOpacity(0)
+                          ]
+                        : [
+                            Colors.redAccent[100],
+                            Colors.redAccent,
+                            Get.theme.backgroundColor.withOpacity(0)
+                          ])
+                : SizedBox(),
       ),
     );
   }
@@ -125,7 +192,7 @@ Type: ${_.session.currentActivity.type.toString()}""",
     );
   }
 
-  Widget _buildDot() {
+  Widget _buildDot(colors) {
     return TweenAnimationBuilder(
       tween: Tween(begin: 0.0, end: 1.0),
       curve: Curves.easeInOutCubic,
@@ -134,14 +201,10 @@ Type: ${_.session.currentActivity.type.toString()}""",
           opacity: val,
           child: Container(
             width: val * 30,
-            height: 30,
+            height: val * 30,
             decoration: BoxDecoration(
               gradient: RadialGradient(
-                colors: [
-                  Colors.redAccent[100],
-                  Colors.redAccent,
-                  Get.theme.backgroundColor.withOpacity(0)
-                ],
+                colors: colors,
               ),
               borderRadius: BorderRadius.circular(20),
             ),

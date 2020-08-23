@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
 import 'package:neumodore/domain/data/session/session.dart';
+import 'package:neumodore/domain/usecases/session/change_state.dart';
 import 'package:neumodore/domain/usecases/session/get_session.dart';
 import 'package:neumodore/domain/usecases/session/increase_activity_duration.dart';
 import 'package:neumodore/domain/usecases/session/pause_activity.dart';
@@ -14,28 +16,28 @@ import 'package:neumodore/domain/usecases/session/stop_session.dart';
 import 'package:neumodore/infra/configuration/configuration_repository.dart';
 
 import 'package:neumodore/infra/repositories/session/isession_repository.dart';
-import 'package:neumodore/infra/services/audio/iaudio_service.dart';
+import 'package:neumodore/infra/services/local_reminder_service.dart';
 
 import 'package:neumodore/infra/services/screen/iscreen_service.dart';
+import 'package:neumodore/shared/helpers/strings.dart';
 
 import 'package:get/get.dart';
-import 'package:neumodore/shared/core/use_case.dart';
 
 class SessionController extends GetxController {
   final NeuProgressController neuProgressController = NeuProgressController();
 
   Timer _timerUpdater;
 
-  ISessionRepository _sessionRepo;
-  ISettingsRepository _settingsRepo;
-  IAudioService _audioService;
-  IScreenService _screenService;
+  final ISessionRepository _sessionRepo;
+  final ISettingsRepository _settingsRepo;
+  final IScreenService _screenService;
+  final LocalReminderService _reminderService;
 
   SessionController(
     this._sessionRepo,
     this._settingsRepo,
-    this._audioService,
     this._screenService,
+    this._reminderService,
   ) {
     _timerUpdater = Timer.periodic(Duration(milliseconds: 500), _onTimerUpdate);
   }
@@ -43,24 +45,46 @@ class SessionController extends GetxController {
 
   // initialized negative to be accepted in conditial bellow
   double lastPercentageUpdate = -1;
+  ActivityState lastState = ActivityState.COMPLETED;
+
+  String get activityName {
+    switch (session.currentActivity.type) {
+      case ActivityType.POMODORE:
+        return "pomodore".tr;
+        break;
+      case ActivityType.SHORT_BREAK:
+        return "short_break".tr;
+        break;
+      case ActivityType.LONG_BREAK:
+        return "long_break".tr;
+        break;
+      default:
+    }
+    return "activity";
+  }
 
   void _onTimerUpdate(var tim) {
-    if (currentState() == ActivityState.RUNING) {
-      if (session.percentageComplete != lastPercentageUpdate) {
+    ActivityState curState = currentState;
+
+    if (session.percentageComplete != lastPercentageUpdate ||
+        session.activityState != curState) {
+      if (curState == ActivityState.RUNING) {
         neuProgressController.animateTo(session.percentageComplete);
-        lastPercentageUpdate = session.percentageComplete;
-        update();
+        if (session.remainingTime.inSeconds > 59 &&
+            session.remainingTime.inSeconds < 61) {}
+      } else if (curState == ActivityState.COMPLETED) {
+        neuProgressController.animateTo(1);
+      } else if (curState == ActivityState.STOPPED) {
+        neuProgressController.animateTo(0.01);
       }
-    } else if (currentState() == ActivityState.COMPLETED) {
-      neuProgressController.animateTo(1);
-    } else if (currentState() == ActivityState.STOPPED) {
-      neuProgressController.animateTo(1);
+      lastState = curState;
+      lastPercentageUpdate = session.percentageComplete;
+      update();
     }
   }
 
-  ActivityState currentState() {
-    return GetSessionCase(_sessionRepo).execute(null).activityState;
-  }
+  ActivityState get currentState =>
+      GetSessionCase(_sessionRepo).execute(null).activityState;
 
   changeState(ActivityState nstate) {
     ChangeStateUseCase(_sessionRepo).execute(null);
@@ -84,10 +108,10 @@ class SessionController extends GetxController {
 
   bool allreadyPlayed = false;
   double get progressPercentage {
-    if (currentState() == ActivityState.COMPLETED) {
+    if (currentState == ActivityState.COMPLETED) {
       return 1;
     }
-    if (currentState() == ActivityState.STOPPED) {
+    if (currentState == ActivityState.STOPPED) {
       allreadyPlayed = false;
       return 1;
     }
@@ -98,52 +122,82 @@ class SessionController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+    _screenService.enableWakeLock();
   }
 
-  void startActivity() {
-    StartActivityCase(_sessionRepo, _screenService).execute(null);
+  void startActivity() async {
+    await StartActivityCase(_sessionRepo).execute(null);
+    await _scheduleActivityNotifications(session.remainingTime, tag: "Started");
     update();
   }
 
-  void pauseActivity() {
-    PauseActivityCase(_sessionRepo, _screenService).execute(null);
+  void pauseActivity() async {
+    await PauseActivityCase(_sessionRepo).execute(null);
+    await _cancelNotifications();
     update();
   }
 
-  void resumeActivity() {
-    ResumeActivityCase(_sessionRepo, _screenService).execute(null);
+  void resumeActivity() async {
+    await ResumeActivityCase(_sessionRepo).execute(null);
+    await _scheduleActivityNotifications(session.remainingTime, tag: "Resumed");
     update();
   }
 
-  void skipActivity() {
-    SkipActivityCase(_sessionRepo, _screenService).execute(null);
+  void skipActivity() async {
+    await SkipActivityCase(_sessionRepo).execute(null);
+    await _cancelNotifications();
     update();
   }
 
-  void increaseDuration() {
-    IncreaseActivityDurationCase(_sessionRepo).execute(Duration(minutes: 1));
+  void increaseDuration() async {
+    await IncreaseActivityDurationCase(_sessionRepo)
+        .execute(Duration(minutes: 1));
+    await _scheduleActivityNotifications(session.remainingTime,
+        tag: "Increased");
     update();
   }
 
-  void stopSession() {
-    StopPomodoreSessionCase(_sessionRepo).execute(null);
+  void stopSession() async {
+    await StopPomodoreSessionCase(_sessionRepo).execute(null);
+    _cancelNotifications();
     update();
+  }
+
+  Future _cancelNotifications() async {
+    await _reminderService.cancelAnyNotifications();
+  }
+
+  Future _scheduleActivityNotifications(
+    Duration remainingTime, {
+    String tag = "TAG",
+  }) async {
+    await _cancelNotifications();
+
+    await _reminderService.scheduleProgress(
+      timeoutDuration: remainingTime,
+      msgTitle: "activity_ended".trArgs([activityName]).firstCharUpper(),
+      msgBody: 'activity_ended_body'.trArgs([activityName]).firstCharUpper(),
+      iconResName: "ic_alarm_finished",
+      showWhenStamp: true,
+      iconColor: Colors.green,
+      notificationID: 23,
+      channelTitle: "system_channel_name".tr,
+      channelDescription: "system_channel_desc".tr,
+    );
+    await _reminderService.scheduleProgress(
+      timeoutDuration: (remainingTime - Duration(minutes: 1)),
+      msgTitle: "activity_ending".trArgs([activityName]).firstCharUpper(),
+      msgBody: "activity_ending_body".trArgs([activityName]).firstCharUpper(),
+      iconResName: "ic_less_one_minute",
+      iconColor: Colors.red,
+      showWhenStamp: true,
+      notificationID: 24,
+      channelTitle: "system_channel_name".tr,
+      channelDescription: "system_channel_desc".tr,
+    );
   }
 
   void animateTo(double d) {
     neuProgressController.animateTo(d);
-  }
-}
-
-class ChangeStateUseCase
-    implements UseCase<Future<PomodoreSession>, ActivityState> {
-  ISessionRepository _sessionRepo;
-  ChangeStateUseCase(this._sessionRepo);
-
-  @override
-  Future<PomodoreSession> execute(ActivityState nextState) {
-    return _sessionRepo.saveSession(
-      _sessionRepo.loadSession()..currentActivity.setState(nextState),
-    );
   }
 }

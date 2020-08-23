@@ -4,11 +4,11 @@ import 'package:wakelock/wakelock.dart';
 class ScreenServiceConcrete implements IScreenService {
   @override
   Future disableWakeLock() async {
-    return Wakelock.enable();
+    return Wakelock.disable();
   }
 
   @override
   Future enableWakeLock() async {
-    return Wakelock.disable();
+    return Wakelock.enable();
   }
 }
