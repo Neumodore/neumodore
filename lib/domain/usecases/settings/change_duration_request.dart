@@ -1,11 +1,15 @@
-import 'package:flutter/foundation.dart';
-import 'package:neumodore/domain/app_config/settings_entries.dart';
+import 'package:neumodore/domain/data/activity/activity.dart';
+
+import 'change_settings_duration.dart';
 
 class ChangeDurationRequest {
-  ConfigurationEntry configEntry;
-  Duration ammount;
+  ChangeType changeType;
+  Duration duration;
+  ActivityType activity;
 
-  ChangeDurationRequest({@required configuration, @required value})
-      : this.configEntry = configuration,
-        this.ammount = value;
+  ChangeDurationRequest({
+    this.activity,
+    this.duration,
+    this.changeType,
+  });
 }

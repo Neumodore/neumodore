@@ -42,14 +42,15 @@ class HomeScreen extends StatelessWidget {
                 NeuProgressCircle(
                   child: GetBuilder<SessionController>(
                     builder: (_) {
-                      return ClayText(
-                        '${_.timerOSD}',
-                        emboss: true,
-                        depth: 40,
-                        style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).textTheme.button.color),
+                      return Opacity(
+                        opacity: 0.9,
+                        child: Text(
+                          '${_.timerOSD}',
+                          style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).textTheme.button.color),
+                        ),
                       );
                     },
                   ),

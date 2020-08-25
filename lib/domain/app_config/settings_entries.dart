@@ -59,7 +59,7 @@ class ConfigurationEntry<T> {
   final T Function(String fromStorage) fromStorageTransformer;
   final String Function(T value) toStorageTransformer;
 
-  dynamic getValue(SharedPreferences _storagePrefs) {
+  T getValue(SharedPreferences _storagePrefs) {
     try {
       return fromStorageTransformer(_storagePrefs.getString(entryKey)) ??
           defaultValue;

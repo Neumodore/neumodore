@@ -1,17 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
-import 'package:neumodore/domain/data/session/session.dart';
-import 'package:neumodore/domain/data/session/session_settings.dart';
+import 'package:neumodore/domain/data/session/session_service.dart';
+import 'package:neumodore/infra/repositories/session_settings/session_settings_repository.dart';
 
 main() {
   test('Test pomodore session lifecycle', () async {
-    var pomodoreSession = PomodoreSession(
-      SessionSettings(
-        PomodoreActivity(duration: Duration(seconds: 5)),
-        LongBreakActivity(),
-        ShortBreakActivity(),
-        2,
-      ),
+    var pomodoreSession = PomodoreSessionService(
+      SessionSettingsRepositoryMock(),
     );
 
     pomodoreSession.startSession();

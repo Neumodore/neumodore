@@ -1,6 +1,6 @@
-import 'package:neumodore/domain/data/session/session.dart';
+import 'package:neumodore/domain/data/session/session_service.dart';
 
 abstract class ISessionRepository {
-  saveSession(PomodoreSession _session);
-  PomodoreSession loadSession();
+  saveSession(PomodoreSessionService _session);
+  PomodoreSessionService loadSession();
 }

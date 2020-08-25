@@ -1,4 +1,4 @@
-import 'package:neumodore/domain/data/session/session.dart';
+import 'package:neumodore/domain/data/session/session_service.dart';
 import 'package:neumodore/infra/repositories/session/isession_repository.dart';
 import 'package:neumodore/shared/core/use_case.dart';
 
@@ -7,8 +7,8 @@ class StopPomodoreSessionCase implements UseCase {
 
   StopPomodoreSessionCase(this._sessionRepository);
   @override
-  Future<PomodoreSession> execute(dynamic argument) async {
-    final PomodoreSession session = _sessionRepository.loadSession();
+  Future<PomodoreSessionService> execute(dynamic argument) async {
+    final PomodoreSessionService session = _sessionRepository.loadSession();
     session.resetSession();
     await _sessionRepository.saveSession(session);
     return session;

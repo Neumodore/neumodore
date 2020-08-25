@@ -118,7 +118,7 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
     embossController = AnimationController(
       vsync: this,
       animationBehavior: AnimationBehavior.normal,
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 1),
     )..addListener(() {
         setState(() {
           _embossAnimation = lerpDouble(

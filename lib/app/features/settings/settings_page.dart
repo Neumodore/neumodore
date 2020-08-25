@@ -36,7 +36,7 @@ class SettingsScreen extends StatelessWidget {
                 onPlus: () =>
                     _settingsCtrl.plusPomodoreDuration(Duration(minutes: 1)),
                 onMinus: () =>
-                    _settingsCtrl.minusPomodoreDuration(Duration(minutes: 1)),
+                    _settingsCtrl.decreasePomodore(Duration(minutes: 1)),
               ),
               _buildStepperRow(
                 context,
@@ -45,7 +45,7 @@ class SettingsScreen extends StatelessWidget {
                 onPlus: () =>
                     _settingsCtrl.plusShortBreakDuration(Duration(minutes: 1)),
                 onMinus: () =>
-                    _settingsCtrl.minusShortBreakDuration(Duration(minutes: 1)),
+                    _settingsCtrl.decreaseShortBreak(Duration(minutes: 1)),
               ),
               _buildStepperRow(
                 context,
@@ -54,7 +54,7 @@ class SettingsScreen extends StatelessWidget {
                 onPlus: () =>
                     _settingsCtrl.plusLongBreakDuration(Duration(minutes: 1)),
                 onMinus: () =>
-                    _settingsCtrl.minusLongBreakDuration(Duration(minutes: 1)),
+                    _settingsCtrl.decreaseLongBreak(Duration(minutes: 1)),
               ),
               _buildTextSeparator(context, 'appearence_section'.tr),
               _buildNightModeSwitch(context),

@@ -1,16 +1,13 @@
 import 'package:neumodore/domain/data/activity/activity.dart';
 import 'package:neumodore/domain/data/session/session_settings.dart';
+import 'package:neumodore/infra/repositories/session_settings/session_settings_repository.dart';
 
-class PomodoreSession {
+class PomodoreSessionService {
   Activity currentActivity;
 
   List<Activity> pastActivities = List<Activity>();
 
-  SessionSettings sessionSettings;
-
-  PomodoreSession(this.sessionSettings) {
-    currentActivity = sessionSettings.defaultPomodore;
-  }
+  SessionSettingsRepository sessionSettingsRepository;
 
   List<Activity> get finishedPomodores =>
       pastActivities
@@ -35,8 +32,13 @@ class PomodoreSession {
 
   ActivityState get activityState => currentActivity.getState();
 
-  double get percentageComplete {
-    return currentActivity.percentageComplete;
+  double get percentageComplete => currentActivity.percentageComplete;
+
+  SessionSettings get sessionSettings =>
+      sessionSettingsRepository.loadSettings();
+
+  PomodoreSessionService(this.sessionSettingsRepository) {
+    currentActivity = sessionSettings.defaultPomodore;
   }
 
   void skipActivity() {
@@ -49,7 +51,7 @@ class PomodoreSession {
       if (finishedPomodores.length >= sessionSettings.longIntervalLimit)
         return sessionSettings.defaultLongBreak;
 
-      return sessionSettings.defaultBreak;
+      return sessionSettings.defaultShortBreak;
     } else if (pastActivities.last.type == ActivityType.LONG_BREAK) {
       pastActivities.clear();
       return sessionSettings.defaultPomodore;
@@ -74,12 +76,14 @@ class PomodoreSession {
     currentActivity.endInterruption();
   }
 
-  PomodoreSession.fromJson(Map<String, dynamic> map) {
+  PomodoreSessionService.fromJson(Map<String, dynamic> map) {
     this.currentActivity = Activity.fromJson(map['current_activity']);
+
     this.pastActivities = (map['past_activities'] as List)
         .map((value) => Activity.fromJson(value))
         .toList();
   }
+
   Map<String, dynamic> toJson() {
     return {
       'current_activity': currentActivity.toJson(),

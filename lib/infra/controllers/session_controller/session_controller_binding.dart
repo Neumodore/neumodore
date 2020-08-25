@@ -1,12 +1,11 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
-import 'package:neumodore/domain/data/activity/activity.dart';
-import 'package:neumodore/domain/data/session/session_settings.dart';
 import 'package:neumodore/infra/configuration/configuration_repository.dart';
 import 'package:neumodore/infra/repositories/activity/activity_repository.dart';
 import 'package:neumodore/infra/repositories/activity/iactivity_repo.dart';
 import 'package:neumodore/infra/repositories/session/isession_repository.dart';
 import 'package:neumodore/infra/repositories/session/session_repository.dart';
+import 'package:neumodore/infra/repositories/session_settings/session_settings_repository.dart';
 import 'package:neumodore/infra/repositories/theme/itheme_repository.dart';
 import 'package:neumodore/infra/repositories/theme/theme_repository.dart';
 import 'package:neumodore/infra/services/audio/audio_service_concrete.dart';
@@ -20,7 +19,7 @@ import 'session_controller.dart';
 
 class SessionControllerBinding extends Bindings {
   @override
-  void dependencies() async {
+  void dependencies() {
     Get.lazyPut<IAudioService>(
       () => AudioServiceConcrete(),
     );
@@ -29,7 +28,7 @@ class SessionControllerBinding extends Bindings {
     );
 
     Get.lazyPut<ISettingsRepository>(
-      () => SettingsRepo(
+      () => SettingsRepository(
         Get.find<SharedPreferences>(),
       ),
     );
@@ -46,15 +45,10 @@ class SessionControllerBinding extends Bindings {
       ),
     );
 
-    Get.lazyPut<ISessionRepository>(
-      () => SessionRepository(
+    Get.put<ISessionRepository>(
+      SessionRepository(
         Get.find<SharedPreferences>(),
-        SessionSettings(
-          PomodoreActivity(duration: Duration(minutes: 25)),
-          ShortBreakActivity(duration: Duration(minutes: 5)),
-          LongBreakActivity(duration: Duration(minutes: 15)),
-          4,
-        ),
+        Get.find<SessionSettingsRepository>(),
       ),
     );
 

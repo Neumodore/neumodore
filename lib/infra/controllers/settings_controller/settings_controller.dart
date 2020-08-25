@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/domain/app_config/settings_entries.dart';
+import 'package:neumodore/domain/data/activity/activity.dart';
+import 'package:neumodore/domain/data/session/session_settings.dart';
 import 'package:neumodore/domain/usecases/settings/change_duration_request.dart';
-import 'package:neumodore/domain/usecases/settings/decrease_config_duration.dart';
-import 'package:neumodore/domain/usecases/settings/increase_config_duration.dart';
+import 'package:neumodore/domain/usecases/settings/change_settings_duration.dart';
 import 'package:neumodore/domain/usecases/settings/load_theme_mode_case.dart';
 import 'package:neumodore/domain/usecases/settings/set_theme_mode_case.dart';
-import 'package:neumodore/infra/configuration/configuration_repository.dart';
+import 'package:neumodore/infra/repositories/session_settings/session_settings_repository.dart';
 import 'package:neumodore/infra/repositories/theme/itheme_repository.dart';
 
 class SettingsController extends GetxController {
-  final ISettingsRepository _settingsRepo;
   final IThemeRepository _themeRepository;
 
   final SetThemeModeUseCase _setThemeModeCase;
@@ -18,18 +18,23 @@ class SettingsController extends GetxController {
 
   final SettingsEntries settings = SettingsEntries();
 
-  SettingsController(this._settingsRepo, this._themeRepository)
+  final SessionSettingsRepository _sessionSettingsRepo;
+
+  SettingsController(this._themeRepository, this._sessionSettingsRepo)
       : this._setThemeModeCase = SetThemeModeUseCase(_themeRepository),
         this._loadThemeModeCase = LoadThemeModeUseCase(_themeRepository);
 
   String get pomodoreInterval =>
-      _fetchConfig(settings.pomodoreDuration)?.inMinutes?.toString() ?? "--";
+      _fetchConfig?.defaultPomodore?.totalDuration?.inMinutes?.toString() ??
+      "--";
 
   String get shortBreakInterval =>
-      _fetchConfig(settings.shortBreakDuration)?.inMinutes?.toString() ?? "--";
+      _fetchConfig?.defaultShortBreak?.totalDuration?.inMinutes?.toString() ??
+      "--";
 
   String get longBreakInterval =>
-      _fetchConfig(settings.longBreakDuration)?.inMinutes?.toString() ?? "--";
+      _fetchConfig?.defaultLongBreak?.totalDuration?.inMinutes?.toString() ??
+      "--";
 
   ThemeMode get themeMode => _loadThemeModeCase.execute(ThemeMode.system);
 
@@ -63,59 +68,59 @@ class SettingsController extends GetxController {
   }
 
   plusPomodoreDuration(Duration duration) async {
-    await _increaseDuration(settings.pomodoreDuration, duration);
+    await _increaseDuration(ActivityType.POMODORE, duration);
     update();
   }
 
   plusLongBreakDuration(Duration duration) async {
-    await _increaseDuration(settings.longBreakDuration, duration);
+    await _increaseDuration(ActivityType.LONG_BREAK, duration);
     update();
   }
 
   plusShortBreakDuration(Duration duration) async {
-    await _increaseDuration(settings.shortBreakDuration, duration);
+    await _increaseDuration(ActivityType.SHORT_BREAK, duration);
     update();
   }
 
-  minusPomodoreDuration(Duration duration) async {
-    await _decreaseDuration(settings.pomodoreDuration, duration);
+  decreasePomodore(Duration duration) async {
+    await _decreaseDuration(ActivityType.POMODORE, duration);
     update();
   }
 
-  minusLongBreakDuration(Duration duration) async {
-    await _decreaseDuration(settings.longBreakDuration, duration);
+  decreaseLongBreak(Duration duration) async {
+    await _decreaseDuration(ActivityType.LONG_BREAK, duration);
     update();
   }
 
-  minusShortBreakDuration(Duration duration) async {
-    await _decreaseDuration(settings.shortBreakDuration, duration);
+  decreaseShortBreak(Duration duration) async {
+    await _decreaseDuration(ActivityType.SHORT_BREAK, duration);
     update();
   }
 
-  _fetchConfig(ConfigurationEntry config) => _settingsRepo.getConfiguration(
-        config,
-      );
+  SessionSettings get _fetchConfig => this._sessionSettingsRepo.loadSettings();
 
   _increaseDuration(
-    ConfigurationEntry config,
+    ActivityType type,
     Duration duration,
   ) {
-    return IncreaseConfigDurationCase(_settingsRepo).execute(
+    return ChangeSettingsDurationCase(_sessionSettingsRepo).execute(
       ChangeDurationRequest(
-        configuration: config,
-        value: duration,
+        activity: type,
+        duration: duration,
+        changeType: ChangeType.INCREASE,
       ),
     );
   }
 
   _decreaseDuration(
-    ConfigurationEntry<Duration> config,
-    Duration value,
+    ActivityType type,
+    Duration duration,
   ) {
-    DecreaseConfigDurationCase(_settingsRepo).execute(
+    return ChangeSettingsDurationCase(_sessionSettingsRepo).execute(
       ChangeDurationRequest(
-        configuration: config,
-        value: value,
+        activity: type,
+        duration: duration,
+        changeType: ChangeType.DECREASE,
       ),
     );
   }

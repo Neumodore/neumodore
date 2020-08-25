@@ -9,10 +9,10 @@ abstract class ISettingsRepository {
   dynamic getConfiguration(ConfigurationEntry<dynamic> entry);
 }
 
-class SettingsRepo implements ISettingsRepository {
+class SettingsRepository implements ISettingsRepository {
   SharedPreferences _sharedPrefs;
 
-  SettingsRepo(this._sharedPrefs);
+  SettingsRepository(this._sharedPrefs);
 
   @override
   dynamic getConfiguration(

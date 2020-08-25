@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
-import 'package:neumodore/domain/data/session/session.dart';
+import 'package:neumodore/domain/data/session/session_service.dart';
 import 'package:neumodore/domain/usecases/session/change_state.dart';
 import 'package:neumodore/domain/usecases/session/get_session.dart';
 import 'package:neumodore/domain/usecases/session/increase_activity_duration.dart';
@@ -41,7 +41,8 @@ class SessionController extends GetxController {
   ) {
     _timerUpdater = Timer.periodic(Duration(milliseconds: 500), _onTimerUpdate);
   }
-  PomodoreSession get session => GetSessionCase(_sessionRepo).execute(null);
+  PomodoreSessionService get session =>
+      GetSessionCase(_sessionRepo).execute(null);
 
   // initialized negative to be accepted in conditial bellow
   double lastPercentageUpdate = -1;
