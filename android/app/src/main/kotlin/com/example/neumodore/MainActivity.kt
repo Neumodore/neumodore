@@ -1,4 +1,4 @@
-package com.example.neumodore
+package dev.vinicios.neumodore
 
 import io.flutter.embedding.android.FlutterActivity
 

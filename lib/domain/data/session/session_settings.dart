@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
 
 class SessionSettings {
