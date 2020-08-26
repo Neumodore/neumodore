@@ -18,11 +18,12 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: "12.x"
-      - name: Writing keystores
+      - name: Writing keyproperties
       - uses: timheuer/base64-to-file@v1.0.3
         with:
           fileName: "android/key.properties"
           encodedString: ${{ secrets.KEY_PROPERTIES_PROD }}
+      - name: Writing keystore file
       - uses: timheuer/base64-to-file@v1.0.3
         with:
           fileName: "android/neumodore_key.jks"
