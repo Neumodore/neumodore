@@ -18,16 +18,6 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: "12.x"
-      - name: Writing keyproperties
-      - uses: timheuer/base64-to-file@v1.0.3
-        with:
-          fileName: "android/key.properties"
-          encodedString: ${{ secrets.KEY_PROPERTIES_PROD }}
-      - name: Writing keystore file
-      - uses: timheuer/base64-to-file@v1.0.3
-        with:
-          fileName: "android/neumodore_key.jks"
-          encodedString: ${{ secrets.JKS_PROD }}
       - name: Build artifacts
       - uses: subosito/flutter-action@v1
         with:
