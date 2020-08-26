@@ -5,7 +5,8 @@ name: Build Artifacts
 # events but only for the master branch
 on:
   push:
-    tags: v*
+    tags:
+      - v*
   pull_request:
     branches: [production]
 jobs:
