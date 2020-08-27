@@ -20,16 +20,12 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: "12.x"
-      - name: Writing key.properties
+      - name: Decoding android/key.properties
         uses: timheuer/base64-to-file@v1.0.3
-        with:
-          fileName: "android/key.properties"
-          encodedString: ${{ secrets.KEY_PROPERTIES_PROD }}
-      - name: Writing keystore.jks
+        run: echo "${{ secrets.KEY_PROPERTIES_PROD }}" | base64 --decode > android/key.properties
+      - name: Decoding android/neumodore_key.jks
         uses: timheuer/base64-to-file@v1.0.3
-        with:
-          fileName: "android/neumodore_key.jks"
-          encodedString: ${{ secrets.JKS_PROD }}
+        run: echo "${{ secrets.JKS_PROD }}" | base64 --decode > android/neumodore_key.jks
       - uses: subosito/flutter-action@v1
         with:
           flutter-version: "1.17.5"
