@@ -21,10 +21,8 @@ jobs:
         with:
           java-version: "12.x"
       - name: Decoding android/key.properties
-        uses: timheuer/base64-to-file@v1.0.3
         run: echo "${{ secrets.KEY_PROPERTIES_PROD }}" | base64 --decode > android/key.properties
       - name: Decoding android/neumodore_key.jks
-        uses: timheuer/base64-to-file@v1.0.3
         run: echo "${{ secrets.JKS_PROD }}" | base64 --decode > android/neumodore_key.jks
       - uses: subosito/flutter-action@v1
         with:
