@@ -106,6 +106,9 @@ class SessionController extends GetxController {
   }
 
   int get finishedPomodores => this.session?.finishedPomodores?.length ?? 0;
+  int get finishedBreaks => (this.session?.finishedShortBreaks?.length ??
+      0 + this.session?.finishedLongBreaks?.length ??
+      0);
 
   bool allreadyPlayed = false;
   double get progressPercentage {
@@ -114,7 +117,7 @@ class SessionController extends GetxController {
     }
     if (currentState == ActivityState.STOPPED) {
       allreadyPlayed = false;
-      return 1;
+      return 0.01;
     }
     allreadyPlayed = false;
     return this.session.percentageComplete;

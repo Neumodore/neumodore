@@ -10,8 +10,6 @@ import 'package:neumodore/infra/controllers/session_controller/session_controlle
 
 class HomeScreen extends StatelessWidget {
   static String name = '/home';
-  final neuProgressEndColor = Colors.redAccent;
-  final neuProgressStartColor = Colors.greenAccent;
 
   final SessionController _homePageCtrl = Get.find();
 
@@ -39,10 +37,10 @@ class HomeScreen extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                NeuProgressCircle(
-                  child: GetBuilder<SessionController>(
-                    builder: (_) {
-                      return Opacity(
+                GetBuilder<SessionController>(
+                  builder: (_) {
+                    return NeuProgressCircle(
+                      child: Opacity(
                         opacity: 0.9,
                         child: Text(
                           '${_.timerOSD}',
@@ -51,13 +49,22 @@ class HomeScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).textTheme.button.color),
                         ),
-                      );
-                    },
-                  ),
-                  initialValue: 0.01,
-                  defaultDuration: Duration(seconds: 4),
-                  defaultCurve: Curves.easeOutCirc,
-                  controller: _homePageCtrl.neuProgressController,
+                      ),
+                      initialValue: 0.01,
+                      defaultDuration: Duration(seconds: 4),
+                      defaultCurve: Curves.easeOutCirc,
+                      initialColor:
+                          _homePageCtrl.session.currentActivity.type ==
+                                  ActivityType.POMODORE
+                              ? Colors.greenAccent
+                              : Colors.blue,
+                      finalColor: _homePageCtrl.session.currentActivity.type ==
+                              ActivityType.POMODORE
+                          ? Colors.red
+                          : Colors.greenAccent,
+                      controller: _homePageCtrl.neuProgressController,
+                    );
+                  },
                 ),
               ],
             ),
@@ -95,12 +102,15 @@ class HomeScreen extends StatelessWidget {
               child: GetBuilder<SessionController>(
                 builder: (_) {
                   List<Widget> dots = [];
-                  for (var currentDot = 0; currentDot < 4; currentDot++) {
+                  for (int dotIdx = 0;
+                      dotIdx < _.session.sessionSettings.longIntervalLimit;
+                      dotIdx++) {
                     dots.add(_buildLight(
                       context,
-                      currentDot,
-                      _.finishedPomodores,
+                      dotIdx,
+                      _.session.pastActivities,
                       _.progressPercentage,
+                      _.session.currentActivity,
                     ));
                   }
                   return Row(
@@ -116,43 +126,118 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Padding _buildLight(
+  Widget _buildLight(
     BuildContext context,
-    int currentDot,
-    int finishedPomodores,
+    int dotIndex,
+    List<Activity> pastActivities,
     double percentageComplete,
+    Activity currentActivity,
   ) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ClayContainer(
-        width: 20,
-        height: 20,
-        emboss: true,
-        spread: 2,
-        borderRadius: 100,
-        depth: 30,
-        color: Theme.of(context).backgroundColor,
-        child: currentDot < finishedPomodores
-            ? _buildDot(currentDot == finishedPomodores && finishedPomodores > 0
-                ? [
-                    Color.lerp(
-                      Colors.orangeAccent[100],
-                      Colors.redAccent[100],
-                      percentageComplete,
-                    ),
-                    Color.lerp(
-                      Colors.orangeAccent,
-                      Colors.redAccent,
-                      percentageComplete,
-                    ),
-                    Get.theme.backgroundColor.withOpacity(0)
-                  ]
-                : [
-                    Colors.redAccent[100],
-                    Colors.redAccent,
-                    Get.theme.backgroundColor.withOpacity(0)
-                  ])
-            : SizedBox(),
+    var empty = SizedBox();
+    var poomoIndicator = _buildDot([
+      Color.lerp(
+        Colors.greenAccent[100],
+        Colors.redAccent[100],
+        percentageComplete,
+      ),
+      Color.lerp(
+        Colors.greenAccent,
+        Colors.redAccent,
+        percentageComplete,
+      ),
+      Get.theme.backgroundColor.withOpacity(0)
+    ]);
+    var breakIndicator = _buildDot([
+      Color.lerp(
+        Colors.blueAccent[100],
+        Colors.greenAccent[100],
+        percentageComplete,
+      ),
+      Color.lerp(
+        Colors.blue,
+        Colors.green,
+        percentageComplete,
+      ),
+      Get.theme.backgroundColor.withOpacity(0)
+    ]);
+    var longbreakIndicator = _buildDot([
+      Color.lerp(
+        Colors.purpleAccent[100],
+        Colors.greenAccent[100],
+        percentageComplete,
+      ),
+      Color.lerp(
+        Colors.purple,
+        Colors.green,
+        percentageComplete,
+      ),
+      Get.theme.backgroundColor.withOpacity(0)
+    ]);
+    var finishIndicator = _buildDot([
+      Color.lerp(
+        Colors.orangeAccent[100],
+        Colors.redAccent[100],
+        1,
+      ),
+      Color.lerp(
+        Colors.orangeAccent,
+        Colors.redAccent,
+        1,
+      ),
+      Get.theme.backgroundColor.withOpacity(0)
+    ]);
+    Widget usedDot = empty;
+
+    Function isFinished = () {
+      return (dotIndex < _homePageCtrl.finishedPomodores);
+    };
+
+    Function isCurrent = () {
+      return (dotIndex == _homePageCtrl.finishedPomodores);
+    };
+
+    Function isInBreak = () {
+      return !isFinished() && currentActivity.type == ActivityType.SHORT_BREAK;
+    };
+    Function isInLongBreak = () {
+      return !isFinished() && currentActivity.type == ActivityType.LONG_BREAK;
+    };
+    Function isPomodore = () {
+      return currentActivity.type == ActivityType.POMODORE;
+    };
+
+    if (isFinished()) {
+      usedDot = finishIndicator;
+    } else if (isCurrent()) {
+      if (isPomodore()) {
+        usedDot = poomoIndicator;
+      }
+      if (isInBreak()) {
+        usedDot = breakIndicator;
+      }
+      if (isInLongBreak()) {
+        usedDot = longbreakIndicator;
+      }
+    } else {
+      usedDot = empty;
+    }
+
+    return TweenAnimationBuilder(
+      tween: Tween(begin: 0.0, end: 1.0),
+      curve: Curves.easeInOutCirc,
+      duration: Duration(seconds: 1),
+      builder: (ctx, val, child) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ClayContainer(
+          width: 20,
+          height: 20,
+          emboss: true,
+          spread: 2,
+          borderRadius: 100,
+          depth: (30 * val).round(),
+          color: Theme.of(context).backgroundColor,
+          child: usedDot,
+        ),
       ),
     );
   }
@@ -206,142 +291,112 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildControlls(ActivityState state) {
+    final stopBtn = Container(
+      padding: EdgeInsets.only(top: 50),
+      child: FadedNeumoButton(
+        onPressed: () {
+          _homePageCtrl.stopSession();
+        },
+        child: Icon(Icons.stop),
+      ),
+    );
+    final resumeBtn = Container(
+      padding: EdgeInsets.only(top: 50),
+      child: FadedNeumoButton(
+        onPressed: () async {
+          _homePageCtrl.resumeActivity();
+        },
+        padding: EdgeInsets.all(20),
+        child: Icon(Icons.play_arrow),
+      ),
+    );
+
+    final pauseBtn = Container(
+      padding: EdgeInsets.only(top: 50),
+      child: FadedNeumoButton(
+        onPressed: () async {
+          _homePageCtrl.pauseActivity();
+        },
+        padding: EdgeInsets.all(20),
+        child: Icon(Icons.pause),
+      ),
+    );
+    final inscreaseBtn = Container(
+      padding: EdgeInsets.only(top: 50),
+      child: FadedNeumoButton(
+        onPressed: () async {
+          _homePageCtrl.increaseDuration();
+        },
+        padding: EdgeInsets.all(20),
+        child: Icon(Icons.exposure_plus_1),
+      ),
+    );
+    List<Widget> buttons = [];
     switch (state) {
       case ActivityState.PAUSED:
-        return _buildPausedControlls();
+        buttons = [resumeBtn, _buildSkipBtn()];
+
         break;
       case ActivityState.RUNING:
-        return _buildPlayingControlls();
+        buttons = [pauseBtn, _buildSkipBtn()];
         break;
       case ActivityState.STOPPED:
-        return _buildStoppedControlls();
+        buttons = [_buildStartBtn(), _buildSkipBtn()];
         break;
       case ActivityState.COMPLETED:
-        return _buildStoppedControlls();
+        buttons = [_buildStartBtn(), _buildSkipBtn()];
         break;
     }
-    return _buildPlayingControlls();
-  }
 
-  Row _buildStoppedControlls() {
+    if (_homePageCtrl.finishedPomodores > 0 || state != ActivityState.STOPPED) {
+      buttons.insert(0, stopBtn);
+    }
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.only(top: 50),
-          child: FadedNeumoButton(
-            onPressed: () async {
-              _homePageCtrl.startActivity();
-            },
-            padding: EdgeInsets.all(20),
-            child: Icon(Icons.play_arrow),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.only(top: 50),
-          child: FadedNeumoButton(
-            onPressed: () async {
-              _homePageCtrl.skipActivity();
-            },
-            padding: EdgeInsets.all(20),
-            child: Icon(Icons.skip_next),
-          ),
-        ),
-      ],
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: buttons,
     );
   }
 
-  Row _buildPlayingControlls() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.only(top: 50),
-          child: FadedNeumoButton(
-            onPressed: () {
-              _homePageCtrl.stopSession();
-            },
-            child: Icon(Icons.stop),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.only(top: 50),
-          child: FadedNeumoButton(
-            onPressed: () async {
-              _homePageCtrl.pauseActivity();
-            },
-            padding: EdgeInsets.all(20),
-            child: Icon(Icons.pause),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.only(top: 50),
-          child: FadedNeumoButton(
-            onPressed: () async {
-              _homePageCtrl.increaseDuration();
-            },
-            padding: EdgeInsets.all(20),
-            child: Icon(Icons.exposure_plus_1),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.only(top: 50),
-          child: FadedNeumoButton(
-            onPressed: () async {
-              _homePageCtrl.skipActivity();
-            },
-            padding: EdgeInsets.all(20),
-            child: Icon(Icons.skip_next),
-          ),
-        ),
-      ],
+  _buildSkipBtn() {
+    IconData skipIcon = Icons.skip_next;
+    if (_homePageCtrl.session.currentActivity.type == ActivityType.POMODORE &&
+        _homePageCtrl.finishedPomodores < 3) {
+      skipIcon = Icons.free_breakfast;
+    } else if (_homePageCtrl.session.currentActivity.type ==
+        ActivityType.SHORT_BREAK) {
+      skipIcon = Icons.work;
+    } else if (_homePageCtrl.session.currentActivity.type ==
+        ActivityType.POMODORE) {
+      skipIcon = Icons.directions_run;
+    } else {
+      skipIcon = Icons.repeat;
+    }
+    final skipBtn = Container(
+      padding: EdgeInsets.only(top: 50),
+      child: FadedNeumoButton(
+        onPressed: () async {
+          _homePageCtrl.skipActivity();
+        },
+        padding: EdgeInsets.all(20),
+        child: Icon(skipIcon),
+      ),
     );
+    return skipBtn;
   }
 
-  Row _buildPausedControlls() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.only(top: 50),
-          child: FadedNeumoButton(
-            onPressed: () {
-              _homePageCtrl.stopSession();
-            },
-            child: Icon(Icons.stop),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.only(top: 50),
-          child: FadedNeumoButton(
-            onPressed: () async {
-              _homePageCtrl.resumeActivity();
-            },
-            padding: EdgeInsets.all(20),
-            child: Icon(Icons.play_arrow),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.only(top: 50),
-          child: FadedNeumoButton(
-            onPressed: () async {
-              _homePageCtrl.increaseDuration();
-            },
-            padding: EdgeInsets.all(20),
-            child: Icon(Icons.exposure_plus_1),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.only(top: 50),
-          child: FadedNeumoButton(
-            onPressed: () async {
-              _homePageCtrl.skipActivity();
-            },
-            padding: EdgeInsets.all(20),
-            child: Icon(Icons.skip_next),
-          ),
-        ),
-      ],
+  _buildStartBtn() {
+    var workicon = Icons.play_arrow;
+
+    final startBtn = Container(
+      padding: EdgeInsets.only(top: 50),
+      child: FadedNeumoButton(
+        onPressed: () async {
+          _homePageCtrl.startActivity();
+        },
+        padding: EdgeInsets.all(20),
+        child: Icon(workicon),
+      ),
     );
+    return startBtn;
   }
 }

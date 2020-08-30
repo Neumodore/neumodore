@@ -12,6 +12,7 @@ class SkipActivityCase
   Future<PomodoreSessionService> execute(dynamic argument) async {
     final currentSession = this._sessionRepository.loadSession();
     currentSession.skipActivity();
+    currentSession.startSession();
     await this._sessionRepository.saveSession(currentSession);
     return currentSession;
   }
