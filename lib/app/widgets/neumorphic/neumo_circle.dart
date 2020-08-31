@@ -118,7 +118,7 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
     embossController = AnimationController(
       vsync: this,
       animationBehavior: AnimationBehavior.normal,
-      duration: Duration(seconds: 1),
+      duration: Duration(milliseconds: 500),
     )..addListener(() {
         setState(() {
           _embossAnimation = lerpDouble(
@@ -159,24 +159,30 @@ class _NeuProgressCircleState extends State<NeuProgressCircle>
           );
         });
       });
+
     fillColorController.animateTo(
       .01,
       curve: widget.introDefaultCurve,
-      duration: widget.introDuration,
-    );
-    embossController.animateTo(
-      1,
-      curve: widget.introDefaultCurve,
-      duration: widget.introDuration,
-    )..whenComplete(() => thicknessController.animateTo(
+      duration: Duration(milliseconds: 100),
+    )..whenComplete(() {
+        embossController.animateTo(
           1,
           curve: widget.introDefaultCurve,
-          duration: widget.introDuration,
-        )..whenComplete(() => fillColorController.animateTo(
-              1,
-              curve: widget.introDefaultCurve,
-              duration: widget.introDuration,
-            )));
+          duration: widget.introDuration * .2,
+        )..whenComplete(
+            () {
+              thicknessController.animateTo(
+                1,
+                curve: widget.introDefaultCurve,
+                duration: widget.introDuration * .4,
+              )..whenComplete(() => fillColorController.animateTo(
+                    1,
+                    curve: widget.introDefaultCurve,
+                    duration: widget.introDuration * .5,
+                  ));
+            },
+          );
+      });
   }
 
   @override

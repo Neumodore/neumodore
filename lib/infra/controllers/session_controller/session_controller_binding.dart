@@ -15,6 +15,7 @@ import 'package:neumodore/infra/services/screen/iscreen_service.dart';
 import 'package:neumodore/infra/services/screen/screen_service_concrete.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../ads_controller.dart';
 import 'session_controller.dart';
 
 class SessionControllerBinding extends Bindings {
@@ -68,6 +69,7 @@ class SessionControllerBinding extends Bindings {
         Get.find<ISettingsRepository>(),
         Get.find<IScreenService>(),
         Get.find<LocalReminderService>(),
+        Get.find<AdsController>(),
       ),
       permanent: true,
     );

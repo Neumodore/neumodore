@@ -14,6 +14,7 @@ import 'package:neumodore/domain/usecases/session/start_activity.dart';
 import 'package:neumodore/domain/usecases/session/stop_session.dart';
 
 import 'package:neumodore/infra/configuration/configuration_repository.dart';
+import 'package:neumodore/infra/controllers/ads_controller.dart';
 
 import 'package:neumodore/infra/repositories/session/isession_repository.dart';
 import 'package:neumodore/infra/services/local_reminder_service.dart';
@@ -33,13 +34,17 @@ class SessionController extends GetxController {
   final IScreenService _screenService;
   final LocalReminderService _reminderService;
 
+  final AdsController _adsController;
+
   SessionController(
     this._sessionRepo,
     this._settingsRepo,
     this._screenService,
     this._reminderService,
+    this._adsController,
   ) {
     _timerUpdater = Timer.periodic(Duration(milliseconds: 500), _onTimerUpdate);
+    _adsController.showBanner();
   }
   PomodoreSessionService get session =>
       GetSessionCase(_sessionRepo).execute(null);
@@ -206,6 +211,7 @@ class SessionController extends GetxController {
   }
 
   void goToSettings() {
+    _adsController.showInterstitial();
     Get.offAndToNamed('/settings');
   }
 }

@@ -53,15 +53,8 @@ class HomeScreen extends StatelessWidget {
                       initialValue: 0.01,
                       defaultDuration: Duration(seconds: 4),
                       defaultCurve: Curves.easeOutCirc,
-                      initialColor:
-                          _homePageCtrl.session.currentActivity.type ==
-                                  ActivityType.POMODORE
-                              ? Colors.greenAccent
-                              : Colors.blue,
-                      finalColor: _homePageCtrl.session.currentActivity.type ==
-                              ActivityType.POMODORE
-                          ? Colors.red
-                          : Colors.greenAccent,
+                      initialColor: _getInitialColor(),
+                      finalColor: _getFinalColor(),
                       controller: _homePageCtrl.neuProgressController,
                     );
                   },
@@ -74,17 +67,17 @@ class HomeScreen extends StatelessWidget {
             SizedBox(
               height: 50,
             ),
-//             GetBuilder<SessionController>(
-//               builder: (_) => Text(
-//                 """Duration
-// ${_.durationOSD}
-// Pomodores: ${_.finishedPomodores}
-// State: ${_.currentState.toString()}
-// Type: ${_.session.currentActivity.type.toString()}""",
-//                 textAlign: TextAlign.center,
-//                 style: Theme.of(context).textTheme.headline6,
-//               ),
-//             ),
+            //             GetBuilder<SessionController>(
+            //               builder: (_) => Text(
+            //                 """Duration
+            // ${_.durationOSD}
+            // Pomodores: ${_.finishedPomodores}
+            // State: ${_.currentState.toString()}
+            // Type: ${_.session.currentActivity.type.toString()}""",
+            //                 textAlign: TextAlign.center,
+            //                 style: Theme.of(context).textTheme.headline6,
+            //               ),
+            //             ),
           ],
         ),
       ),
@@ -398,5 +391,17 @@ class HomeScreen extends StatelessWidget {
       ),
     );
     return startBtn;
+  }
+
+  Color _getInitialColor() {
+    return _homePageCtrl.session.currentActivity.type == ActivityType.POMODORE
+        ? Colors.greenAccent
+        : Colors.blue;
+  }
+
+  Color _getFinalColor() {
+    return _homePageCtrl.session.currentActivity.type == ActivityType.POMODORE
+        ? Colors.red
+        : Colors.greenAccent;
   }
 }

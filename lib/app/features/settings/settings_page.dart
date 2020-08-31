@@ -154,7 +154,7 @@ class SettingsScreen extends StatelessWidget {
           ),
           neumoLib.NeuSwitch(
             backgroundColor: Get.theme.backgroundColor,
-            groupValue: Get.isDarkMode ? (Get.isPlatformDarkMode ? 0 : 2) : 1,
+            groupValue: Get.isDarkMode ? (Get.isPlatformDarkMode ? 1 : 2) : 1,
             children: {
               1: Icon(Icons.brightness_high),
               2: Icon(Icons.brightness_3)

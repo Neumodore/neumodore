@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:get/get.dart';
+import 'package:neumodore/infra/controllers/ads_controller.dart';
 import 'package:neumodore/routes.dart';
 import 'package:neumodore/themes.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,11 @@ void main() async {
     await SharedPreferences.getInstance(),
     permanent: true,
   );
+  Get.put<AdsController>(
+    AdsController(),
+    permanent: true,
+  );
+
   runApp(NeumodoreApp());
 }
 
