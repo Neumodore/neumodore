@@ -54,3 +54,4 @@ app.*.map.json
 *.js.map
 */key.properties
 */neumodore_key.jks
+store/*

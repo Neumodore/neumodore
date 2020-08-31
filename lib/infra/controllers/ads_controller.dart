@@ -8,27 +8,27 @@ class AdsController {
 
   InterstitialAd myInterstitial;
 
-  bool enabled = false;
+  bool enabled = true;
 
   AdsController() {
     if (enabled) {
       FirebaseAdMob.instance.initialize(
           appId: "ca-app-pub-2763884853307133~4059181894",
           analyticsEnabled: false);
-      final String bannerAddId = kReleaseMode == false
-          ? BannerAd.testAdUnitId
-          : "ca-app-pub-2763884853307133/6657425079";
-      final String interstitialAddId = kReleaseMode == false
-          ? BannerAd.testAdUnitId
-          : "ca-app-pub-2763884853307133/7716367634";
+      final String bannerAddId = kReleaseMode
+          ? "ca-app-pub-2763884853307133/6657425079"
+          : BannerAd.testAdUnitId;
+      final String interstitialAddId = kReleaseMode
+          ? "ca-app-pub-2763884853307133/7716367634"
+          : BannerAd.testAdUnitId;
       currentTarget = MobileAdTargetingInfo(
         keywords: <String>[
           'productivity',
-          'kanban',
           'pomodore',
+          'tasks',
           'time',
           'tracking',
-          'forecast'
+          'timetracking'
         ],
         contentUrl: 'https://vinicios.dev',
         childDirected: false,
