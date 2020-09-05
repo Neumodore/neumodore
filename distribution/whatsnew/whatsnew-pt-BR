@@ -1,5 +1,4 @@
-Versão inicial em Teste 🧐🧪 
+Versão em Teste 🧐🧪 
 
-- Inicie pomodoro, pule para uma pausa, aumenta um minuto in session.
-- Personalize o tempo do pomomodoro, pausa-curta, pausa-longa, limite de pomodoros para pausa longa.
-- Tema Light/Dark
+- Removido botão de play ao completar atividade
+- Otimizações no código fonte

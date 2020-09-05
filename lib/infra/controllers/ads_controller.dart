@@ -1,5 +1,6 @@
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 class AdsController {
   MobileAdTargetingInfo currentTarget;
@@ -63,16 +64,20 @@ class AdsController {
 
   showBanner() {
     if (enabled) {
-      myBanner
-        // typically this happens well before the ad is shown
-        ..load()
-        ..show(
-          // Positions the banner ad 60 pixels from the bottom of the screen
-          anchorOffset: 20.0,
-          // Positions the banner ad 10 pixels from the center of the screen to the right
-          // Banner Position
-          anchorType: AnchorType.bottom,
-        );
+      try {
+        myBanner
+          // typically this happens well before the ad is shown
+          ..load()
+          ..show(
+            // Positions the banner ad 60 pixels from the bottom of the screen
+            anchorOffset: 20.0,
+            // Positions the banner ad 10 pixels from the center of the screen to the right
+            // Banner Position
+            anchorType: AnchorType.bottom,
+          );
+      } on PlatformException {
+        return;
+      }
     }
   }
 

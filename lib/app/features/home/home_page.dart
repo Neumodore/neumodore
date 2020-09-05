@@ -326,17 +326,16 @@ class HomeScreen extends StatelessWidget {
     );
     List<Widget> buttons = [];
     switch (state) {
+      case ActivityState.COMPLETED:
+        buttons = [_buildSkipBtn()];
+        break;
       case ActivityState.PAUSED:
         buttons = [resumeBtn, _buildSkipBtn()];
-
         break;
       case ActivityState.RUNING:
         buttons = [pauseBtn, _buildSkipBtn()];
         break;
       case ActivityState.STOPPED:
-        buttons = [_buildStartBtn(), _buildSkipBtn()];
-        break;
-      case ActivityState.COMPLETED:
         buttons = [_buildStartBtn(), _buildSkipBtn()];
         break;
     }

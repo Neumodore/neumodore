@@ -1,5 +1,4 @@
-Initial version in testing 🧐🧪
+Version under Testing 🧐🧪 
 
-- Start pomodoro, skip a break, increase one minute in session.
-- Customize the pomomodore time, short pause, long pause, pomodoros limit for long pause.
-- Light / Dark Theme
+- Removed play button on completed activity
+- Source code optimizations
