@@ -9,7 +9,7 @@ on:
       - "v*.*.*" # on every version tag will build a new android artifact example: v3.1.2+6
 jobs:
   build:
-    name: Build APK
+    name: Build Artifacts and Release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -52,7 +52,7 @@ jobs:
           name: APPBUNDLE
           path: build/app/outputs/bundle/release/app-release.aab
   release_internal:
-    name: Release app to internal track
+    name: Release Artifacts to internal track
     needs: [build]
     runs-on: ubuntu-latest
     steps:
