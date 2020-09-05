@@ -28,8 +28,16 @@ jobs:
       - name: Decoding android/neumodore_key.jks
         run: echo "${{ secrets.JKS_PROD }}" | base64 --decode > android/neumodore_key.jks
 
-      - name: Replace APP Version in YAML with tag v
-        run: export FORMATTED_VER=$(echo "${{ github.event.release.tag_name }}" | sed -e 's/v//') && sed -i 's/99.99.99+99/'$FORMATTED_VER'/g' pubspec.yaml && echo "Generated version:"$FORMATTED_VER
+      - uses: olegtarasov/get-tag@v2
+        id: tagName
+        with:
+          tagRegex: 'v([0-9]+.[0-9]+.[0-9]+\+[0-9]+)' # Optional. Returns specified group text as tag name. Full tag string is returned if regex is not defined.
+          tagRegexGroup: 1 # Optional. Default is 1.
+
+      - name: Replace YAML version with tag version
+        run: |
+          sed -i 's/99.99.99+99/'$GIT_TAG_NAME'/g' pubspec.yaml|
+          echo "Generated version:"$GIT_TAG_NAME
 
       - name: Pub Get Packages
         run: flutter pub get
