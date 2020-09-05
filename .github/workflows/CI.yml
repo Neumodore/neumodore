@@ -29,7 +29,7 @@ jobs:
         run: echo "${{ secrets.JKS_PROD }}" | base64 --decode > android/neumodore_key.jks
 
       - name: Replace APP Version in YAML with tag v
-        run: export FORMATTED_VER=$(echo "${{ steps.vars.outputs.tag }}" | sed -e 's/v//') && sed -i 's/99.99.99+99/'$FORMATTED_VER'/g' pubspec.yaml
+        run: export FORMATTED_VER=$(echo "${{ steps.vars.outputs.tag }}" | sed -e 's/v//') && sed -i 's/99.99.99+99/'$FORMATTED_VER'/g' pubspec.yaml && echo "Generated version:"$FORMATTED_VER
 
       - name: Pub Get Packages
         run: flutter pub get
