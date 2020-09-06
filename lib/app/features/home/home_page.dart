@@ -351,18 +351,23 @@ class HomeScreen extends StatelessWidget {
 
   _buildSkipBtn() {
     IconData skipIcon = Icons.skip_next;
-    if (_homePageCtrl.session.currentActivity.type == ActivityType.POMODORE &&
-        _homePageCtrl.finishedPomodores < 3) {
-      skipIcon = Icons.free_breakfast;
-    } else if (_homePageCtrl.session.currentActivity.type ==
-        ActivityType.SHORT_BREAK) {
-      skipIcon = Icons.work;
-    } else if (_homePageCtrl.session.currentActivity.type ==
-        ActivityType.POMODORE) {
-      skipIcon = Icons.directions_run;
-    } else {
-      skipIcon = Icons.repeat;
+
+    switch (_homePageCtrl.session.currentActivity.type) {
+      case ActivityType.POMODORE:
+        if (_homePageCtrl.finishedPomodores < 3) {
+          skipIcon = Icons.free_breakfast;
+        } else {
+          skipIcon = Icons.directions_run;
+        }
+        break;
+      case ActivityType.SHORT_BREAK:
+        skipIcon = Icons.work;
+        break;
+      default:
+        skipIcon = Icons.repeat;
+        break;
     }
+
     final skipBtn = Container(
       padding: EdgeInsets.only(top: 50),
       child: FadedNeumoButton(

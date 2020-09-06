@@ -58,7 +58,7 @@ class Activity {
 
   void start() {
     this.activityStartDate = DateTime.now();
-    setState(ActivityState.RUNING);
+    changeState(ActivityState.RUNING);
   }
 
   void sumInterruption(Duration interruption) {
@@ -67,7 +67,7 @@ class Activity {
 
   void clearInterruptions() {
     _interruptiontotal = Duration.zero;
-    _interruptionStartedAt = DateTime.fromMillisecondsSinceEpoch(0);
+    _interruptionStartedAt = DateTime.now();
   }
 
   void increaseDuration(Duration _duration) {
@@ -76,7 +76,7 @@ class Activity {
 
   void reset() {
     clearInterruptions();
-    setState(ActivityState.STOPPED);
+    changeState(ActivityState.STOPPED);
     totalDuration = _defaultDuration;
     activityStartDate = DateTime.now();
   }
@@ -84,7 +84,7 @@ class Activity {
   void startInterruption() {
     if (getState() == ActivityState.RUNING) {
       _interruptionStartedAt = DateTime.now();
-      setState(ActivityState.PAUSED);
+      changeState(ActivityState.PAUSED);
     }
   }
 
@@ -93,23 +93,26 @@ class Activity {
       sumInterruption(
         DateTime.now().difference(_interruptionStartedAt),
       );
-      setState(ActivityState.RUNING);
+      changeState(ActivityState.RUNING);
     }
   }
 
-  void setState(ActivityState newState) {
+  void changeState(ActivityState newState) {
     _currentState = newState;
   }
 
   Activity.fromJson(Map<String, dynamic> json)
-      : activityStartDate = DateTime.fromMillisecondsSinceEpoch(
-          json['started_at'],
-        ),
+      : activityStartDate =
+            DateTime.fromMillisecondsSinceEpoch(json['started_at']) ??
+                DateTime.now().millisecondsSinceEpoch,
         type = ActivityType.values.elementAt(
           json['type'],
         ),
         totalDuration = Duration(
-          milliseconds: json['duration'],
+          milliseconds: json['duration'] ?? 0,
+        ),
+        _defaultDuration = Duration(
+          milliseconds: json['duration'] ?? 0,
         ),
         _interruptionStartedAt = DateTime.fromMillisecondsSinceEpoch(
           json['interruption_started_at'] ?? 0,

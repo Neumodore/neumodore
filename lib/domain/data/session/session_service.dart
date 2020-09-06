@@ -66,6 +66,7 @@ class PomodoreSessionService {
   void resetSession() {
     currentActivity = sessionSettings.defaultPomodore;
     pastActivities.clear();
+    currentActivity.reset();
   }
 
   void pauseSession() {

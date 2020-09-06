@@ -11,7 +11,7 @@ class ChangeStateUseCase
   @override
   Future<PomodoreSessionService> execute(ActivityState nextState) {
     return _sessionRepo.saveSession(
-      _sessionRepo.loadSession()..currentActivity.setState(nextState),
+      _sessionRepo.loadSession()..currentActivity.changeState(nextState),
     );
   }
 }
