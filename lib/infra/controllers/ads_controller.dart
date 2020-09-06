@@ -63,8 +63,8 @@ class AdsController {
   }
 
   showBanner() {
-    if (enabled) {
-      try {
+    try {
+      if (enabled) {
         myBanner
           // typically this happens well before the ad is shown
           ..load()
@@ -75,21 +75,29 @@ class AdsController {
             // Banner Position
             anchorType: AnchorType.bottom,
           );
-      } on PlatformException {
-        return;
       }
+    } on PlatformException {
+      return;
+    } catch (e) {
+      throw e;
     }
   }
 
   showInterstitial() {
-    if (enabled) {
-      myInterstitial
-        ..load()
-        ..show(
-          anchorType: AnchorType.bottom,
-          anchorOffset: 0.0,
-          horizontalCenterOffset: 0.0,
-        );
+    try {
+      if (enabled) {
+        myInterstitial
+          ..load()
+          ..show(
+            anchorType: AnchorType.bottom,
+            anchorOffset: 0.0,
+            horizontalCenterOffset: 0.0,
+          );
+      }
+    } on PlatformException {
+      return;
+    } catch (e) {
+      throw e;
     }
   }
 }
