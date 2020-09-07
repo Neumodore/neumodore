@@ -1,6 +1,8 @@
 import 'package:clay_containers/clay_containers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:neumodore/app/features/purchases/purchases_page.dart';
+import 'package:neumodore/app/widgets/neumorphic/animated_neumo_button.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_button.dart';
 import 'package:neumodore/infra/controllers/settings_controller/settings_controller.dart';
 
@@ -28,6 +30,16 @@ class SettingsScreen extends StatelessWidget {
           builder: (_) => Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
+              IconButton(
+                onPressed: () {
+                  Get.toNamed(PurchasesPage.name);
+                },
+                icon: Text(
+                  "★",
+                  style:
+                      Theme.of(context).textTheme.button.copyWith(fontSize: 25),
+                ),
+              ),
               _buildTextSeparator(context, 'durations_section'.tr),
               _buildStepperRow(
                 context,
