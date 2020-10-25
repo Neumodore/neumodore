@@ -9,7 +9,7 @@ class AdsController {
 
   InterstitialAd myInterstitial;
 
-  bool enabled = true;
+  bool enabled = kReleaseMode && false;
 
   AdsController() {
     if (enabled) {

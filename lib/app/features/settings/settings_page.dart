@@ -30,16 +30,6 @@ class SettingsScreen extends StatelessWidget {
           builder: (_) => Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              IconButton(
-                onPressed: () {
-                  Get.toNamed(PurchasesPage.name);
-                },
-                icon: Text(
-                  "★",
-                  style:
-                      Theme.of(context).textTheme.button.copyWith(fontSize: 25),
-                ),
-              ),
               _buildTextSeparator(context, 'durations_section'.tr),
               _buildStepperRow(
                 context,
@@ -70,10 +60,37 @@ class SettingsScreen extends StatelessWidget {
               ),
               _buildTextSeparator(context, 'appearence_section'.tr),
               _buildNightModeSwitch(context),
+              // _buildTextSeparator(context, 'other_section'.tr),
+              // _buildPowerUpRow(context),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPowerUpRow(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Text("purchases_title".tr),
+        FadedNeumoButton(
+          onPressed: () {
+            Get.offAndToNamed(PurchasesPage.name);
+          },
+          padding: EdgeInsets.symmetric(
+            vertical: 10,
+            horizontal: 15,
+          ),
+          child: Text(
+            "★",
+            style: Theme.of(context)
+                .textTheme
+                .button
+                .copyWith(color: Colors.orange, fontSize: 30),
+          ),
+        )
+      ],
     );
   }
 
@@ -154,7 +171,7 @@ class SettingsScreen extends StatelessWidget {
     BuildContext context,
   ) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
@@ -193,7 +210,7 @@ class SettingsScreen extends StatelessWidget {
           emboss: true,
           child: Padding(
             padding: const EdgeInsets.symmetric(
-              vertical: 5,
+              vertical: 10,
               horizontal: 15,
             ),
             child: child,

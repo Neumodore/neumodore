@@ -4,6 +4,12 @@ import 'dart:io';
 import 'package:in_app_purchase/in_app_purchase.dart';
 
 class IAPService {
+  final Set<String> _kIds = {
+    'donate_cookie',
+    'donate_mcchicken',
+    'donate_gourmet_coffee'
+  };
+
   StreamSubscription<List<PurchaseDetails>> _subscription;
 
   InAppPurchaseConnection get _instance => InAppPurchaseConnection.instance;
@@ -50,17 +56,14 @@ class IAPService {
   }
 
   Future<List<ProductDetails>> listProducts() async {
-    if (!await iapAvailable) {
-      const Set<String> _kIds = {'product1', 'product2'};
-      final ProductDetailsResponse response =
-          await InAppPurchaseConnection.instance.queryProductDetails(_kIds);
-      if (response.notFoundIDs.isNotEmpty) {
-        // Handle the error.
-      }
-      List<ProductDetails> products = response.productDetails;
-      // The store cannot be reached or accessed. Update the UI accordingly.
-      return products;
+    final ProductDetailsResponse response =
+        await InAppPurchaseConnection.instance.queryProductDetails(_kIds);
+    if (response.notFoundIDs.isNotEmpty) {
+      // Handle the error.
     }
+    List<ProductDetails> products = response.productDetails;
+    // The store cannot be reached or accessed. Update the UI accordingly.
+    return products;
   }
 
   void dispose() {

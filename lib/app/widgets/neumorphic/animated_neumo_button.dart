@@ -4,7 +4,7 @@ import 'neumo_button.dart';
 
 class FadedNeumoButton extends StatelessWidget {
   final EdgeInsets padding;
-  final Icon child;
+  final Widget child;
   final VoidCallback onPressed;
 
   FadedNeumoButton({

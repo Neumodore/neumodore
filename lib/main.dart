@@ -2,8 +2,9 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:get/get.dart';
+import 'package:neumodore/app/features/intro/intro.dart';
 import 'package:neumodore/infra/controllers/ads_controller.dart';
-import 'package:neumodore/infra/services/in_app_purchase_service.dart';
+import 'package:neumodore/infra/services/iap_service.dart';
 import 'package:neumodore/routes.dart';
 import 'package:neumodore/themes.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +44,7 @@ class NeumodoreApp extends StatelessWidget {
         Platform.localeName.split('_')[0],
         Platform.localeName.split('_')[1],
       ),
-      initialRoute: '/intro',
+      initialRoute: IntroScreen.route,
       theme: NeumodoreThemes.light(),
       darkTheme: NeumodoreThemes.dark(),
       // home: CheckScreen(), // (predatorx7) Used to test user issues.
@@ -57,6 +58,8 @@ class NeumodoreTranslations extends Translations {
         'en': {
           'title': 'Neumodore',
           'settings_title': 'Settings',
+          'purchases_title': 'Help me stay alive',
+          'other_section': 'Others',
           'enable_night_mode': 'Enable night mode',
           'durations_section': 'Durations',
           'pomodore': 'pomodore',
@@ -77,6 +80,8 @@ class NeumodoreTranslations extends Translations {
         'pt_BR': {
           'title': 'Neumodoro',
           'settings_title': 'Configurações',
+          'purchases_title': 'Mantenha o app vivo',
+          'other_section': 'Outros',
           'enable_night_mode': 'Ativar tema noturno',
           'durations_section': 'Durações',
           'pomodore': 'pomodoro',

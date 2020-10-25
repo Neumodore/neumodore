@@ -10,7 +10,7 @@ import 'package:neumodore/infra/controllers/splashcreen_controller/splashscreen_
 
 final routes = [
   GetPage(
-    name: IntroScreen.name,
+    name: IntroScreen.route,
     page: () => IntroScreen(),
     bindings: [
       SettingsScreenBinding(),
@@ -36,7 +36,7 @@ final routes = [
   GetPage(
     name: PurchasesPage.name,
     page: () => PurchasesPage(),
-    transition: Transition.native,
+    transition: Transition.leftToRight,
     title: "Purchases",
     binding: PurchasesBinding(),
   )

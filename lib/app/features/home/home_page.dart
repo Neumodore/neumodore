@@ -64,6 +64,12 @@ class HomeScreen extends StatelessWidget {
             GetBuilder<SessionController>(builder: (_) {
               return _buildControlls(_.currentState);
             }),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                _buildPlusMinuteBtn(),
+              ],
+            ),
             SizedBox(
               height: 50,
             ),
@@ -314,16 +320,6 @@ class HomeScreen extends StatelessWidget {
         child: Icon(Icons.pause),
       ),
     );
-    final inscreaseBtn = Container(
-      padding: EdgeInsets.only(top: 50),
-      child: FadedNeumoButton(
-        onPressed: () async {
-          _homePageCtrl.increaseDuration();
-        },
-        padding: EdgeInsets.all(20),
-        child: Icon(Icons.exposure_plus_1),
-      ),
-    );
     List<Widget> buttons = [];
     switch (state) {
       case ActivityState.COMPLETED:
@@ -346,6 +342,19 @@ class HomeScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: buttons,
+    );
+  }
+
+  Container _buildPlusMinuteBtn() {
+    return Container(
+      padding: EdgeInsets.only(top: 50),
+      child: FadedNeumoButton(
+        onPressed: () async {
+          _homePageCtrl.increaseDuration();
+        },
+        padding: EdgeInsets.all(20),
+        child: Icon(Icons.exposure_plus_1),
+      ),
     );
   }
 

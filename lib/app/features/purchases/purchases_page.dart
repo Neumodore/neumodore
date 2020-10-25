@@ -1,8 +1,8 @@
+import 'package:clay_containers/clay_containers.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_button.dart';
 import 'package:neumodore/infra/controllers/purchases_controller/purchases_controller.dart';
-import 'package:neumodore/infra/controllers/settings_controller/settings_controller.dart';
 
 class PurchasesPage extends StatelessWidget {
   static String name = '/purchases';
@@ -24,36 +24,68 @@ class PurchasesPage extends StatelessWidget {
         padding: const EdgeInsets.all(20.0),
         child: GetBuilder<PurchasesController>(
           builder: (_) => ListView.builder(
-            physics:
-                AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+            physics: AlwaysScrollableScrollPhysics(
+              parent: BouncingScrollPhysics(),
+            ),
             itemBuilder: (ctx, idx) {
-              return Container(
-                  child: Column(
-                children: <Widget>[
-                  Center(
-                    child: Text(
-                      _?.products?.elementAt(idx)?.title ?? "Title",
-                    ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      Text(
-                        _?.products?.elementAt(idx)?.description ??
-                            "Description",
-                      ),
-                      Text(
-                        _?.products?.elementAt(idx)?.price ?? "Price",
-                      ),
-                    ],
-                  ),
-                ],
-              ));
+              return _buildProductRow(context, _, idx);
             },
             itemCount: _?.products?.length ?? 10,
           ),
         ),
       ),
+    );
+  }
+
+  Padding _buildProductRow(
+      BuildContext context, PurchasesController _, int idx) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 15.0),
+      child: ClayContainer(
+          emboss: true,
+          spread: 10,
+          curveType: CurveType.convex,
+          color: Theme.of(context).backgroundColor,
+          borderRadius: 20,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
+            child: Row(
+              children: <Widget>[
+                Icon(
+                  Icons.local_drink,
+                  size: 40,
+                ),
+                Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Center(
+                        child: Text(
+                          _?.products?.elementAt(idx)?.skuDetail?.title ??
+                              "Title",
+                          style: Theme.of(context).textTheme.bodyText2,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      _?.products?.elementAt(idx)?.description ?? "Description",
+                      style: Theme.of(context).textTheme.bodyText1,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: <Widget>[
+                        Spacer(),
+                        Text(
+                          _?.products?.elementAt(idx)?.price ?? "Price",
+                          style: Theme.of(context).textTheme.button,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )),
     );
   }
 
@@ -132,13 +164,13 @@ class PurchasesPage extends StatelessWidget {
             Text(
               'purchases_title'.tr,
               style:
-                  Theme.of(context).textTheme.headline6.copyWith(fontSize: 34),
+                  Theme.of(context).textTheme.headline6.copyWith(fontSize: 28),
             ),
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: NeumoButton(
                 onPressed: () {
-                  Get.offAndToNamed('/home');
+                  Get.offAndToNamed('/settings');
                 },
                 child: Icon(Icons.chevron_left),
               ),
