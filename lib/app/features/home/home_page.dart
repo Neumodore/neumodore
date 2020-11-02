@@ -2,11 +2,13 @@ import 'package:clay_containers/clay_containers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 import 'package:get/get.dart';
 import 'package:neumodore/app/widgets/neumorphic/animated_neumo_button.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumodore/infra/controllers/session_controller/session_controller.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatelessWidget {
   static String name = '/home';
@@ -73,17 +75,16 @@ class HomeScreen extends StatelessWidget {
             SizedBox(
               height: 50,
             ),
-            //             GetBuilder<SessionController>(
-            //               builder: (_) => Text(
-            //                 """Duration
-            // ${_.durationOSD}
-            // Pomodores: ${_.finishedPomodores}
-            // State: ${_.currentState.toString()}
-            // Type: ${_.session.currentActivity.type.toString()}""",
-            //                 textAlign: TextAlign.center,
-            //                 style: Theme.of(context).textTheme.headline6,
-            //               ),
-            //             ),
+            RaisedButton(
+              child: Text("Clickup Signin"),
+              onPressed: () async {
+                final String clientId = "BUXTWDZ8OIY1ZTL4XGQQFVP0EMM0NPB5";
+                final String redirectUri = "https://neumodore.herokuapp.com";
+
+                await launch(
+                    "https://app.clickup.com/api?client_id=$clientId&redirect_uri=$redirectUri/clickup");
+              },
+            )
           ],
         ),
       ),

@@ -23,9 +23,13 @@ class SessionSettingsRepository {
         4,
       ),
       fromStorageTransformer: (fromStorage) {
-        final decoded = jsonDecode(fromStorage);
-        final mapped = SessionSettings.fromJson(decoded);
-        return mapped;
+        if (fromStorage != null) {
+          final decoded = jsonDecode(fromStorage);
+          final mapped = SessionSettings.fromJson(decoded);
+          return mapped;
+        } else {
+          throw Exception("Session Settings empty");
+        }
       },
       toStorageTransformer: (value) {
         final mapped = value.toJson();

@@ -2,8 +2,9 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:get/get.dart';
-import 'package:neumodore/app/features/intro/intro.dart';
+import 'package:neumodore/app/features/splashscreen/splashscreen.dart';
 import 'package:neumodore/infra/controllers/ads_controller.dart';
+import 'package:neumodore/infra/services/deep_links.dart';
 import 'package:neumodore/infra/services/iap_service.dart';
 import 'package:neumodore/routes.dart';
 import 'package:neumodore/themes.dart';
@@ -17,6 +18,7 @@ void main() async {
 
   final sharedPrefs = await SharedPreferences.getInstance();
 
+  Get.put<DeepLinkService>(DeepLinkService()..initUniLinks(), permanent: true);
   Get.put<SharedPreferences>(sharedPrefs, permanent: true);
   Get.put<AdsController>(AdsController(), permanent: true);
   Get.put<IAPService>(IAPService(), permanent: true);
