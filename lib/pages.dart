@@ -1,4 +1,6 @@
 import 'package:get/get.dart';
+import 'package:neumodore/app/features/clickup/clickup_binding.dart';
+import 'package:neumodore/app/features/clickup/clickup_page.dart';
 import 'package:neumodore/app/features/home/home_page.dart';
 
 import 'package:neumodore/app/features/purchases/purchases_page.dart';
@@ -14,6 +16,7 @@ final routes = [
     name: IntroScreen.route,
     page: () => IntroScreen(),
     bindings: [
+      ClickupBinding(),
       SettingsScreenBinding(),
       SplashScreenBinding(),
     ],
@@ -40,5 +43,11 @@ final routes = [
     transition: Transition.leftToRight,
     title: "Purchases",
     binding: PurchasesBinding(),
+  ),
+  GetPage(
+    name: ClickupPage.name,
+    page: () => ClickupPage(),
+    title: "clickup_login".tr,
+    binding: ClickupBinding(),
   )
 ];

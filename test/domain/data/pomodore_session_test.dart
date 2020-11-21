@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
-import 'package:neumodore/domain/data/session/session_service.dart';
+import 'package:neumodore/domain/data/pomodore_session/session_service.dart';
 import 'package:neumodore/infra/repositories/session_settings/session_settings_repository.dart';
 
 main() {

@@ -11,7 +11,10 @@ class SplashScreenController extends GetxController {
   final DeepLinkService _deepLinkService;
 
   SplashScreenController(
-      this.themeRepository, this.phraseService, this._deepLinkService);
+    this.themeRepository,
+    this.phraseService,
+    this._deepLinkService,
+  );
 
   ThemeMode _themeMode = ThemeMode.system;
   ThemeMode get themeMode => _themeMode;

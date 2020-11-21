@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:neumodore/domain/app_config/settings_entries.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
-import 'package:neumodore/domain/data/session/session_settings.dart';
+import 'package:neumodore/domain/data/pomodore_session/session_settings.dart';
 import 'package:neumodore/infra/configuration/configuration_repository.dart';
 
 const SESSION_SETTINGS_KEY = 'session_settings';

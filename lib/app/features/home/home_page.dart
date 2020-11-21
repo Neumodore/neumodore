@@ -4,17 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 import 'package:get/get.dart';
+import 'package:neumodore/app/features/clickup/clickup_controller.dart';
 import 'package:neumodore/app/widgets/neumorphic/animated_neumo_button.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumodore/infra/controllers/session_controller/session_controller.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class HomeScreen extends StatelessWidget {
   static String name = '/home';
 
   final SessionController _homePageCtrl = Get.find();
 
+  final ClickupController _clickupCtrl = Get.find();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +33,29 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _buildDotIndicator(context),
+            Stack(
+              fit: StackFit.loose,
+              children: <Widget>[
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    _buildDotIndicator(context),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    _buildClickupLoginBtn(),
+                    SizedBox(
+                      width: 20,
+                    )
+                  ],
+                ),
+              ],
+            ),
             SizedBox(
               height: Get.mediaQuery.size.height * 0.05,
             ),
@@ -75,53 +98,34 @@ class HomeScreen extends StatelessWidget {
             SizedBox(
               height: 50,
             ),
-            RaisedButton(
-              child: Text("Clickup Signin"),
-              onPressed: () async {
-                final String clientId = "BUXTWDZ8OIY1ZTL4XGQQFVP0EMM0NPB5";
-                final String redirectUri = "https://neumodore.herokuapp.com";
-
-                await launch(
-                    "https://app.clickup.com/api?client_id=$clientId&redirect_uri=$redirectUri/clickup");
-              },
-            )
           ],
         ),
       ),
     );
   }
 
-  Padding _buildDotIndicator(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 30.0),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              height: 50,
-              child: GetBuilder<SessionController>(
-                builder: (_) {
-                  List<Widget> dots = [];
-                  for (int dotIdx = 0;
-                      dotIdx < _.session.sessionSettings.longIntervalLimit;
-                      dotIdx++) {
-                    dots.add(_buildLight(
-                      context,
-                      dotIdx,
-                      _.session.pastActivities,
-                      _.progressPercentage,
-                      _.session.currentActivity,
-                    ));
-                  }
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: dots,
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
+  Widget _buildDotIndicator(BuildContext context) {
+    return Container(
+      height: 50,
+      child: GetBuilder<SessionController>(
+        builder: (_) {
+          List<Widget> dots = [];
+          for (int dotIdx = 0;
+              dotIdx < _.session.sessionSettings.longIntervalLimit;
+              dotIdx++) {
+            dots.add(_buildLight(
+              context,
+              dotIdx,
+              _.session.pastActivities,
+              _.progressPercentage,
+              _.session.currentActivity,
+            ));
+          }
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: dots,
+          );
+        },
       ),
     );
   }
@@ -346,7 +350,22 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Container _buildPlusMinuteBtn() {
+  Widget _buildClickupLoginBtn() {
+    return Container(
+      width: 50,
+      child: GestureDetector(
+        onTapUp: (tap) async {
+          _clickupCtrl.authenticateOrLaunchClickup();
+        },
+        child: Image.asset(
+          'assets/icons/clickup.png',
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlusMinuteBtn() {
     return Container(
       padding: EdgeInsets.only(top: 50),
       child: FadedNeumoButton(

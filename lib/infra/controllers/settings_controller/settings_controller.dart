@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/domain/app_config/settings_entries.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
-import 'package:neumodore/domain/data/session/session_settings.dart';
+import 'package:neumodore/domain/data/pomodore_session/session_settings.dart';
 import 'package:neumodore/domain/usecases/settings/change_duration_request.dart';
 import 'package:neumodore/domain/usecases/settings/change_settings_duration.dart';
 import 'package:neumodore/domain/usecases/settings/load_theme_mode_case.dart';

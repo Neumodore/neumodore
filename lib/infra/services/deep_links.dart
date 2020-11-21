@@ -5,14 +5,12 @@ import 'package:rxdart/rxdart.dart';
 import 'package:uni_links/uni_links.dart';
 
 class DeepLinkService {
-  BehaviorSubject<Uri> uriSubjectReplay;
+  ReplaySubject<Uri> linkOpenSubject = new ReplaySubject<Uri>(maxSize: 1);
   StreamSubscription<Uri> _sub;
 
-  DeepLinkService() {
-    uriSubjectReplay = new BehaviorSubject<Uri>();
-  }
+  DeepLinkService();
 
-  Future<Null> initUniLinks() async {
+  Future<DeepLinkService> initUniLinks() async {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       // Parse the link and warn the user, if it is not correct,
@@ -30,11 +28,12 @@ class DeepLinkService {
     }, onError: (err) {
       // Handle exception by warning the user their action did not succeed
     });
+    return this;
   }
 
   void notifyListeners(Uri initialLink) {
     if (initialLink != null) {
-      uriSubjectReplay.add(initialLink);
+      linkOpenSubject.add(initialLink);
     }
   }
 }

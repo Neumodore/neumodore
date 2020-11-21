@@ -6,7 +6,7 @@ import 'package:neumodore/infra/controllers/purchases_controller/purchases_contr
 
 class PurchasesPage extends StatelessWidget {
   static String name = '/purchases';
-  final PurchasesController _settingsCtrl = Get.find();
+  final PurchasesController _purchasesController = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -86,71 +86,6 @@ class PurchasesPage extends StatelessWidget {
               ],
             ),
           )),
-    );
-  }
-
-  Row _buildStepperRow(
-    BuildContext context, {
-    String name,
-    String value,
-    onPlus,
-    onMinus,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Expanded(
-          child: Text(
-            name,
-            style: Theme.of(context).textTheme.button,
-          ),
-        ),
-        _buildStepper(
-          context,
-          value: value,
-          onPlus: onPlus,
-          onMinus: onMinus,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStepper(
-    BuildContext context, {
-    String value,
-    VoidCallback onPlus,
-    VoidCallback onMinus,
-  }) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: NeumoButton(
-            padding: EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 10,
-            ),
-            child: Icon(Icons.remove),
-            onPressed: onMinus,
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 10),
-          child: Text(
-            value,
-            style: Theme.of(context).textTheme.headline6,
-          ),
-        ),
-        Padding(
-          padding: const EdgeInsets.all(15.0),
-          child: NeumoButton(
-            padding: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-            child: Icon(Icons.add),
-            onPressed: onPlus,
-          ),
-        )
-      ],
     );
   }
 

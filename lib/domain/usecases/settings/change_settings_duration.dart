@@ -1,5 +1,5 @@
 import 'package:neumodore/domain/data/activity/activity.dart';
-import 'package:neumodore/domain/data/session/session_settings.dart';
+import 'package:neumodore/domain/data/pomodore_session/session_settings.dart';
 import 'package:neumodore/infra/repositories/session_settings/session_settings_repository.dart';
 import 'package:neumodore/shared/core/use_case.dart';
 import 'package:neumodore/domain/usecases/settings/change_duration_request.dart';
