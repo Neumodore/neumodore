@@ -222,6 +222,50 @@ class ClickupPage extends StatelessWidget {
             fillColor: Colors.white.withOpacity(0.5),
             disabledColor: Colors.black,
             onPressed: _.setOrigin,
+          ),
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text("Select the FINISHED status:"),
+              )
+            ],
+          ),
+          ToggleButtons(
+            isSelected: _.destinationStatus,
+            children: _.statuses.map((status) {
+              var name = status['status'] ?? 'name';
+              return Container(
+                height: 50,
+                padding: const EdgeInsets.all(10),
+                color: Color.lerp(
+                  HexColor.fromHex(status["color"]),
+                  Theme.of(context).backgroundColor.withOpacity(0.2),
+                  0.8,
+                ),
+                child: Row(
+                  children: <Widget>[
+                    Text(
+                      name,
+                      style: Theme.of(context).textTheme.bodyText2,
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+            constraints: BoxConstraints.tightFor(),
+            selectedColor: Colors.white,
+            fillColor: Colors.white.withOpacity(0.5),
+            disabledColor: Colors.black,
+            onPressed: _.setDestination,
+          ),
+          Spacer(),
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: NeumoButton(
+              child: Text("Save Settings"),
+              onPressed: _.closeClickupPage,
+            ),
           )
         ],
       ),

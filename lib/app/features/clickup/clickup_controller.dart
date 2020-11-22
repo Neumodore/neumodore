@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/domain/services/clickup/clickup_api.dart';
@@ -16,6 +17,14 @@ class ClickupController extends GetxController {
   var _fetchedTeams, _fetchedSpaces, _fetchedLists, _fetchedStatuses;
 
   StreamSubscription<Uri> _fromLinkSubscription;
+
+  String fromStatus;
+
+  String toStatus;
+
+  dynamic _selectedList;
+
+  dynamic _fetchedTasks;
 
   List<dynamic> get teams {
     return _fetchedTeams != null ? _fetchedTeams['teams'] : [];
@@ -80,13 +89,24 @@ class ClickupController extends GetxController {
 
   void chooseList(data) async {
     _fetchedStatuses = await clickupService.getStatusesFromList(data["id"]);
+    _selectedList = data;
     originStatus = statuses.map((v) => false).toList();
+    destinationStatus = originStatus;
     goToPage(3);
   }
 
   void setOrigin(int index) {
     originStatus = originStatus.map((e) => false).toList();
     originStatus[index] = !originStatus[index];
+    fromStatus = statuses[index]["status"];
+    update();
+  }
+
+  List<bool> destinationStatus = [];
+  void setDestination(int index) {
+    destinationStatus = destinationStatus.map((e) => false).toList();
+    destinationStatus[index] = !destinationStatus[index];
+    toStatus = statuses[index]["status"];
     update();
   }
 
@@ -110,5 +130,52 @@ class ClickupController extends GetxController {
       await launch(
           "https://app.clickup.com/api?client_id=$clientId&redirect_uri=$redirectUri/clickup");
     }
+  }
+
+  closeClickupPage() async {
+    await refreshTasks();
+    Get.back();
+  }
+
+  Future refreshTasks() async {
+    _fetchedTasks =
+        await clickupService.getTasksFromList(this._selectedList["id"]);
+    update();
+  }
+
+  fromTasks() {
+    return _fetchedTasks?.where((task) {
+          return task["status"]["status"] == fromStatus;
+        }) ??
+        [];
+  }
+
+  PageController activePageView = PageController();
+
+  void closeTask() async {
+    final task = await _fetchedTasks[activePageView.page.toInt() - 1];
+    final updated = await clickupService.updateTaskStatus(task["id"], toStatus);
+    _fetchedTasks[activePageView.page.toInt()] = updated;
+    update();
+
+    Get.snackbar(
+      "task_closed".tr,
+      "press_undo_to_revert_changes".tr,
+      snackStyle: SnackStyle.FLOATING,
+      mainButton: FlatButton(
+        child: Text("undo".tr),
+        onPressed: reopenTask,
+      ),
+      duration: Duration(seconds: 10),
+    );
+  }
+
+  void reopenTask() async {
+    final task = await _fetchedTasks[activePageView.page.toInt() - 1];
+    final updated =
+        await clickupService.updateTaskStatus(task["id"], fromStatus);
+    _fetchedTasks[activePageView.page.toInt()] = updated;
+    Get.back();
+    update();
   }
 }

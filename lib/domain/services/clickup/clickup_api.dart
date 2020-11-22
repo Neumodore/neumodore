@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -69,20 +71,42 @@ class ClickupApiService {
     return (await http.get('https://api.clickup.com/api/v2/team')).data;
   }
 
-  Future getSpacesFromTeam(String team) async {
+  Future getSpacesFromTeam(String teamID) async {
     return (await http.get(
-            'https://api.clickup.com/api/v2/team/$team/space?archived=false'))
+            'https://api.clickup.com/api/v2/team/$teamID/space?archived=false'))
         .data;
   }
 
-  Future getListsFromSpace(String space) async {
+  Future getListsFromSpace(String spaceID) async {
     return (await http.get(
-            'https://api.clickup.com/api/v2/space/$space/list?archived=false'))
+            'https://api.clickup.com/api/v2/space/$spaceID/list?archived=false'))
         .data;
   }
 
-  Future getStatusesFromList(String list) async {
-    return (await http.get('https://api.clickup.com/api/v2/list/$list')).data;
+  Future getStatusesFromList(String listID) async {
+    return (await http.get('https://api.clickup.com/api/v2/list/$listID')).data;
+  }
+
+  Future getTasksFromList(String listID) async {
+    return (await http.get(
+            'https://api.clickup.com/api/v2/list/$listID/task?archived=false'))
+        .data["tasks"];
+  }
+
+  Future updateTask(String taskID, dynamic payload) async {
+    return (await http.put(
+      'https://api.clickup.com/api/v2/task/$taskID',
+      data: payload,
+    ))
+        .data;
+  }
+
+  Future updateTaskStatus(String taskID, String status) async {
+    return (await http.put(
+      'https://api.clickup.com/api/v2/task/$taskID',
+      data: {"status": status},
+    ))
+        .data;
   }
 }
 

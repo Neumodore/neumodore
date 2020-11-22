@@ -9,13 +9,14 @@ import 'package:neumodore/app/widgets/neumorphic/animated_neumo_button.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumodore/infra/controllers/session_controller/session_controller.dart';
+import 'package:neumodore/shared/helpers/colors.dart';
 
 class HomeScreen extends StatelessWidget {
   static String name = '/home';
 
   final SessionController _homePageCtrl = Get.find();
-
   final ClickupController _clickupCtrl = Get.find();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,6 +34,16 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _buildClickupLoginBtn(),
+                ],
+              ),
+            ),
             Stack(
               fit: StackFit.loose,
               children: <Widget>[
@@ -42,16 +53,6 @@ class HomeScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     _buildDotIndicator(context),
-                  ],
-                ),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    _buildClickupLoginBtn(),
-                    SizedBox(
-                      width: 20,
-                    )
                   ],
                 ),
               ],
@@ -86,18 +87,20 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            GetBuilder<SessionController>(builder: (_) {
-              return _buildControlls(_.currentState);
-            }),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                _buildPlusMinuteBtn(),
-              ],
+            GetBuilder<SessionController>(
+              builder: (_) {
+                return _buildControlls(_.currentState);
+              },
             ),
             SizedBox(
-              height: 50,
+              height: 15,
             ),
+            GetBuilder<ClickupController>(
+              builder: (_) {
+                return _buildClickupControlls(_);
+              },
+            ),
+            Spacer(),
           ],
         ),
       ),
@@ -334,10 +337,10 @@ class HomeScreen extends StatelessWidget {
         buttons = [resumeBtn, _buildSkipBtn()];
         break;
       case ActivityState.RUNING:
-        buttons = [pauseBtn, _buildSkipBtn()];
+        buttons = [pauseBtn, _buildPlusMinuteBtn(), _buildSkipBtn()];
         break;
       case ActivityState.STOPPED:
-        buttons = [_buildStartBtn(), _buildSkipBtn()];
+        buttons = [_buildStartBtn(), _buildPlusMinuteBtn(), _buildSkipBtn()];
         break;
     }
 
@@ -436,5 +439,77 @@ class HomeScreen extends StatelessWidget {
     return _homePageCtrl.session.currentActivity.type == ActivityType.POMODORE
         ? Colors.red
         : Colors.greenAccent;
+  }
+
+  Widget _buildClickupControlls(ClickupController click) {
+    if (click.fromStatus != null) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: ClayContainer(
+              height: Get.height * 0.08,
+              depth: 10,
+              emboss: true,
+              borderRadius: 20,
+              curveType: CurveType.concave,
+              color: Theme.of(Get.context).backgroundColor,
+              child: PageView(
+                physics: AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics()),
+                controller: click.activePageView,
+                scrollDirection: Axis.vertical,
+                children: click
+                    .fromTasks()
+                    .map<Widget>(
+                      (val) => Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(right: 10.0),
+                                child: Container(
+                                  height: 5,
+                                  width: 5,
+                                  decoration: BoxDecoration(boxShadow: [
+                                    BoxShadow(
+                                        color: HexColor.fromHex(
+                                            val["creator"]["color"]),
+                                        blurRadius: 5,
+                                        spreadRadius: 5)
+                                  ], borderRadius: BorderRadius.circular(100)),
+                                ),
+                              ),
+                              Container(
+                                child: Text(val['name']),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.check,
+                                  color: Colors.greenAccent,
+                                ),
+                                padding: EdgeInsets.all(10),
+                                onPressed: () {
+                                  click.closeTask();
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return SizedBox();
+    }
   }
 }
