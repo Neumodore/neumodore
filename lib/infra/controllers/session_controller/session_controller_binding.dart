@@ -10,6 +10,7 @@ import 'package:neumodore/infra/repositories/theme/itheme_repository.dart';
 import 'package:neumodore/infra/repositories/theme/theme_repository.dart';
 import 'package:neumodore/infra/services/audio/audio_service_concrete.dart';
 import 'package:neumodore/infra/services/audio/iaudio_service.dart';
+import 'package:neumodore/infra/services/deep_links.dart';
 import 'package:neumodore/infra/services/local_reminder_service.dart';
 import 'package:neumodore/infra/services/screen/iscreen_service.dart';
 import 'package:neumodore/infra/services/screen/screen_service_concrete.dart';
@@ -62,14 +63,13 @@ class SessionControllerBinding extends Bindings {
         Get.find<FlutterLocalNotificationsPlugin>(),
       ),
     );
-
     Get.put<SessionController>(
       SessionController(
         Get.find<ISessionRepository>(),
-        Get.find<ISettingsRepository>(),
         Get.find<IScreenService>(),
         Get.find<LocalReminderService>(),
         Get.find<AdsController>(),
+        Get.find<DeepLinkService>(),
       ),
       permanent: true,
     );

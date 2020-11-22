@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/domain/data/quote_model.dart';
 import 'package:neumodore/infra/repositories/theme/itheme_repository.dart';
+import 'package:neumodore/infra/services/deep_links.dart';
 import 'package:neumodore/infra/services/phrase_service.dart';
 
 class SplashScreenController extends GetxController {
   final IThemeRepository themeRepository;
   final PhraseService phraseService;
+  final DeepLinkService _deepLinkService;
 
-  SplashScreenController(this.themeRepository, this.phraseService);
+  SplashScreenController(
+    this.themeRepository,
+    this.phraseService,
+    this._deepLinkService,
+  );
 
   ThemeMode _themeMode = ThemeMode.system;
   ThemeMode get themeMode => _themeMode;
@@ -19,6 +25,7 @@ class SplashScreenController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
+
     _quote = await PhraseService().fetchRandomPhrase();
 
     Future.delayed(Duration(milliseconds: 10), () {
@@ -27,8 +34,8 @@ class SplashScreenController extends GetxController {
     });
     update();
 
-    Future.delayed(Duration(milliseconds: _quote.millisNeedToRead()), () {
-      Get.offAllNamed("/home");
+    Future.delayed(Duration(milliseconds: _quote.millisNeedToRead()), () async {
+      await Get.offAllNamed("/home");
     });
   }
 }

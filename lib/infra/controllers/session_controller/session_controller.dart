@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:neumodore/app/features/clickup/clickup_page.dart';
+import 'package:neumodore/app/features/purchases/purchases_page.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
-import 'package:neumodore/domain/data/session/session_service.dart';
+import 'package:neumodore/domain/data/pomodore_session/session_service.dart';
 import 'package:neumodore/domain/usecases/session/change_state.dart';
 import 'package:neumodore/domain/usecases/session/get_session.dart';
 import 'package:neumodore/domain/usecases/session/increase_activity_duration.dart';
@@ -13,10 +15,10 @@ import 'package:neumodore/domain/usecases/session/skip_activity.dart';
 import 'package:neumodore/domain/usecases/session/start_activity.dart';
 import 'package:neumodore/domain/usecases/session/stop_session.dart';
 
-import 'package:neumodore/infra/configuration/configuration_repository.dart';
 import 'package:neumodore/infra/controllers/ads_controller.dart';
 
 import 'package:neumodore/infra/repositories/session/isession_repository.dart';
+import 'package:neumodore/infra/services/deep_links.dart';
 import 'package:neumodore/infra/services/local_reminder_service.dart';
 
 import 'package:neumodore/infra/services/screen/iscreen_service.dart';
@@ -27,23 +29,16 @@ import 'package:get/get.dart';
 class SessionController extends GetxController {
   final NeuProgressController neuProgressController = NeuProgressController();
 
-  Timer _timerUpdater;
-
   final ISessionRepository _sessionRepo;
-  final ISettingsRepository _settingsRepo;
   final IScreenService _screenService;
   final LocalReminderService _reminderService;
 
   final AdsController _adsController;
 
-  SessionController(
-    this._sessionRepo,
-    this._settingsRepo,
-    this._screenService,
-    this._reminderService,
-    this._adsController,
-  ) {
-    _timerUpdater = Timer.periodic(Duration(milliseconds: 500), _onTimerUpdate);
+  final DeepLinkService _deepLinking;
+
+  SessionController(this._sessionRepo, this._screenService,
+      this._reminderService, this._adsController, this._deepLinking) {
     _adsController.showBanner();
   }
   PomodoreSessionService get session =>
@@ -67,6 +62,12 @@ class SessionController extends GetxController {
       default:
     }
     return "activity";
+  }
+
+  @override
+  void onInit() async {
+    super.onInit();
+    _screenService.enableWakeLock();
   }
 
   void _onTimerUpdate(var tim) {
@@ -126,12 +127,6 @@ class SessionController extends GetxController {
     }
     allreadyPlayed = false;
     return this.session.percentageComplete;
-  }
-
-  @override
-  void onInit() async {
-    super.onInit();
-    _screenService.enableWakeLock();
   }
 
   void startActivity() async {

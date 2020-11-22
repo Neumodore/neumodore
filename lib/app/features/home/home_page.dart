@@ -2,16 +2,20 @@ import 'package:clay_containers/clay_containers.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+
 import 'package:get/get.dart';
+import 'package:neumodore/app/features/clickup/clickup_controller.dart';
 import 'package:neumodore/app/widgets/neumorphic/animated_neumo_button.dart';
 import 'package:neumodore/domain/data/activity/activity.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
 import 'package:neumodore/infra/controllers/session_controller/session_controller.dart';
+import 'package:neumodore/shared/helpers/colors.dart';
 
 class HomeScreen extends StatelessWidget {
   static String name = '/home';
 
   final SessionController _homePageCtrl = Get.find();
+  final ClickupController _clickupCtrl = Get.find();
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +34,29 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            _buildDotIndicator(context),
+            Container(
+              padding: const EdgeInsets.all(20),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _buildClickupLoginBtn(),
+                ],
+              ),
+            ),
+            Stack(
+              fit: StackFit.loose,
+              children: <Widget>[
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    _buildDotIndicator(context),
+                  ],
+                ),
+              ],
+            ),
             SizedBox(
               height: Get.mediaQuery.size.height * 0.05,
             ),
@@ -61,66 +87,48 @@ class HomeScreen extends StatelessWidget {
                 ),
               ],
             ),
-            GetBuilder<SessionController>(builder: (_) {
-              return _buildControlls(_.currentState);
-            }),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: <Widget>[
-                _buildPlusMinuteBtn(),
-              ],
+            GetBuilder<SessionController>(
+              builder: (_) {
+                return _buildControlls(_.currentState);
+              },
             ),
             SizedBox(
-              height: 50,
+              height: 15,
             ),
-            //             GetBuilder<SessionController>(
-            //               builder: (_) => Text(
-            //                 """Duration
-            // ${_.durationOSD}
-            // Pomodores: ${_.finishedPomodores}
-            // State: ${_.currentState.toString()}
-            // Type: ${_.session.currentActivity.type.toString()}""",
-            //                 textAlign: TextAlign.center,
-            //                 style: Theme.of(context).textTheme.headline6,
-            //               ),
-            //             ),
+            GetBuilder<ClickupController>(
+              builder: (_) {
+                return _buildClickupControlls(_);
+              },
+            ),
+            Spacer(),
           ],
         ),
       ),
     );
   }
 
-  Padding _buildDotIndicator(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 30.0),
-      child: Row(
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              height: 50,
-              child: GetBuilder<SessionController>(
-                builder: (_) {
-                  List<Widget> dots = [];
-                  for (int dotIdx = 0;
-                      dotIdx < _.session.sessionSettings.longIntervalLimit;
-                      dotIdx++) {
-                    dots.add(_buildLight(
-                      context,
-                      dotIdx,
-                      _.session.pastActivities,
-                      _.progressPercentage,
-                      _.session.currentActivity,
-                    ));
-                  }
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: dots,
-                  );
-                },
-              ),
-            ),
-          ),
-        ],
+  Widget _buildDotIndicator(BuildContext context) {
+    return Container(
+      height: 50,
+      child: GetBuilder<SessionController>(
+        builder: (_) {
+          List<Widget> dots = [];
+          for (int dotIdx = 0;
+              dotIdx < _.session.sessionSettings.longIntervalLimit;
+              dotIdx++) {
+            dots.add(_buildLight(
+              context,
+              dotIdx,
+              _.session.pastActivities,
+              _.progressPercentage,
+              _.session.currentActivity,
+            ));
+          }
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: dots,
+          );
+        },
       ),
     );
   }
@@ -329,10 +337,10 @@ class HomeScreen extends StatelessWidget {
         buttons = [resumeBtn, _buildSkipBtn()];
         break;
       case ActivityState.RUNING:
-        buttons = [pauseBtn, _buildSkipBtn()];
+        buttons = [pauseBtn, _buildPlusMinuteBtn(), _buildSkipBtn()];
         break;
       case ActivityState.STOPPED:
-        buttons = [_buildStartBtn(), _buildSkipBtn()];
+        buttons = [_buildStartBtn(), _buildPlusMinuteBtn(), _buildSkipBtn()];
         break;
     }
 
@@ -345,7 +353,22 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Container _buildPlusMinuteBtn() {
+  Widget _buildClickupLoginBtn() {
+    return Container(
+      width: 50,
+      child: GestureDetector(
+        onTapUp: (tap) async {
+          _clickupCtrl.authenticateOrLaunchClickup();
+        },
+        child: Image.asset(
+          'assets/icons/clickup.png',
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPlusMinuteBtn() {
     return Container(
       padding: EdgeInsets.only(top: 50),
       child: FadedNeumoButton(
@@ -416,5 +439,77 @@ class HomeScreen extends StatelessWidget {
     return _homePageCtrl.session.currentActivity.type == ActivityType.POMODORE
         ? Colors.red
         : Colors.greenAccent;
+  }
+
+  Widget _buildClickupControlls(ClickupController click) {
+    if (click.fromStatus != null) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: ClayContainer(
+              height: Get.height * 0.08,
+              depth: 10,
+              emboss: true,
+              borderRadius: 20,
+              curveType: CurveType.concave,
+              color: Theme.of(Get.context).backgroundColor,
+              child: PageView(
+                physics: AlwaysScrollableScrollPhysics(
+                    parent: BouncingScrollPhysics()),
+                controller: click.activePageView,
+                scrollDirection: Axis.vertical,
+                children: click
+                    .fromTasks()
+                    .map<Widget>(
+                      (val) => Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.only(right: 10.0),
+                                child: Container(
+                                  height: 5,
+                                  width: 5,
+                                  decoration: BoxDecoration(boxShadow: [
+                                    BoxShadow(
+                                        color: HexColor.fromHex(
+                                            val["creator"]["color"]),
+                                        blurRadius: 5,
+                                        spreadRadius: 5)
+                                  ], borderRadius: BorderRadius.circular(100)),
+                                ),
+                              ),
+                              Container(
+                                child: Text(val['name']),
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  Icons.check,
+                                  color: Colors.greenAccent,
+                                ),
+                                padding: EdgeInsets.all(10),
+                                onPressed: () {
+                                  click.closeTask();
+                                },
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
+                    .toList(),
+              ),
+            ),
+          ),
+        ],
+      );
+    } else {
+      return SizedBox();
+    }
   }
 }

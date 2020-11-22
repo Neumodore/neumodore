@@ -49,7 +49,7 @@ class PomodoreManager {
       .length;
 
   Activity findNextActivity() {
-    if (finishedActivities.length > 0) {
+    if (finishedActivities?.length ?? 0 > 0) {
       if (finishedActivities.last.runtimeType == PomodoreActivity) {
         if (pomodoreCount == 4) {
           return LongBreakActivity();

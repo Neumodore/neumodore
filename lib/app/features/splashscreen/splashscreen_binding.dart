@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
-import 'package:neumodore/infra/controllers/splashcreen_controller/splashscreen_controller.dart';
+import 'package:neumodore/app/features/splashscreen/splashscreen_controller.dart';
 import 'package:neumodore/infra/repositories/theme/itheme_repository.dart';
+import 'package:neumodore/infra/services/deep_links.dart';
 import 'package:neumodore/infra/services/phrase_service.dart';
 
 class SplashScreenBinding extends Bindings {
@@ -12,6 +13,7 @@ class SplashScreenBinding extends Bindings {
       SplashScreenController(
         Get.find<IThemeRepository>(),
         Get.find<PhraseService>(),
+        Get.find<DeepLinkService>(),
       ),
     );
   }
