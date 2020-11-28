@@ -1,12 +1,12 @@
 # This is a basic workflow to help you get started with Actions
-name: CI/CD
+name: CD Beta Lane
 
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
   push:
     tags:
-      - "v*.*.*" # on every version tag will build a new android artifact example: v3.1.2+6
+      - "beta-v*.*.*" # on every version tag will build a new android artifact example: v3.1.2+6
 jobs:
   build:
     name: Build Artifacts and Release
@@ -31,7 +31,7 @@ jobs:
       - uses: olegtarasov/get-tag@v2
         id: tagName
         with:
-          tagRegex: 'v([0-9]+.[0-9]+.[0-9]+\+[0-9]+)' # Optional. Returns specified group text as tag name. Full tag string is returned if regex is not defined.
+          tagRegex: 'beta-v([0-9]+.[0-9]+.[0-9]+\+[0-9]+)' # Optional. Returns specified group text as tag name. Full tag string is returned if regex is not defined.
           tagRegexGroup: 1 # Optional. Default is 1.
 
       - name: Replace YAML version with tag version
@@ -57,7 +57,7 @@ jobs:
           name: APPBUNDLE
           path: build/app/outputs/bundle/release/app-release.aab
   release_internal:
-    name: Release Artifacts to internal track
+    name: Release Artifacts to beta track
     needs: [build]
     runs-on: ubuntu-latest
     steps:
@@ -66,11 +66,11 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: APPBUNDLE
-      - name: Release APPBUNDLE to internal track
+      - name: Release APPBUNDLE to beta track
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAYSTORE_ACCOUNT_KEY }}
           packageName: dev.vinicios.neumodore
           releaseFile: app-release.aab
-          track: internal
+          track: beta
           whatsNewDirectory: distribution/whatsnew
