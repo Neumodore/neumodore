@@ -153,7 +153,7 @@ class ClickupController extends GetxController {
   PageController activePageView = PageController();
 
   void closeTask() async {
-    final task = await _fetchedTasks[activePageView.page.toInt() - 1];
+    final task = await _fetchedTasks[activePageView.page.toInt()];
     final updated = await clickupService.updateTaskStatus(task["id"], toStatus);
     _fetchedTasks[activePageView.page.toInt()] = updated;
     update();
@@ -171,7 +171,7 @@ class ClickupController extends GetxController {
   }
 
   void reopenTask() async {
-    final task = await _fetchedTasks[activePageView.page.toInt() - 1];
+    final task = await _fetchedTasks[activePageView.page];
     final updated =
         await clickupService.updateTaskStatus(task["id"], fromStatus);
     _fetchedTasks[activePageView.page.toInt()] = updated;
