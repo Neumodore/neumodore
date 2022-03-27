@@ -1,18 +1,26 @@
 import 'package:get/get.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
+
 import 'package:neumodore/infra/services/iap_service.dart';
+
+class SkuDetails {
+  String title;
+}
+
+class DigitalProduct {
+  String description, title, price;
+  SkuDetails skuDetail;
+}
 
 class PurchasesController extends GetxController {
   IAPService iapService;
 
-  List<ProductDetails> products = [];
+  List<DigitalProduct> products = [];
 
   PurchasesController(this.iapService);
 
   @override
   void onInit() async {
-    this.products = await this.iapService.listProducts();
-
+    this.products = [];
     update();
 
     super.onInit();

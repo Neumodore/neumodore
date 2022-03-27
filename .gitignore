@@ -59,3 +59,7 @@ app.*.map.json
 # Store assets
 distribution/screenshots/*
 distribution/promotional/*
+
+# flutter version manager .fvm
+# local fvm location file
+.fvm/flutter_sdk

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:neumodore/domain/services/clickup/clickup_api.dart';
 import 'package:neumodore/infra/services/deep_links.dart';

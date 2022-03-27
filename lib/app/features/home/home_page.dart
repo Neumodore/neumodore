@@ -1,13 +1,10 @@
 import 'package:clay_containers/clay_containers.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-
 import 'package:get/get.dart';
 import 'package:neumodore/app/features/clickup/clickup_controller.dart';
 import 'package:neumodore/app/widgets/neumorphic/animated_neumo_button.dart';
-import 'package:neumodore/domain/data/activity/activity.dart';
 import 'package:neumodore/app/widgets/neumorphic/neumo_circle.dart';
+import 'package:neumodore/domain/data/activity/activity.dart';
 import 'package:neumodore/infra/controllers/session_controller/session_controller.dart';
 import 'package:neumodore/shared/helpers/colors.dart';
 

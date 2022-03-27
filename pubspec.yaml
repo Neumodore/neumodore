@@ -44,9 +44,9 @@ dependencies:
   flutter_local_notifications: 1.4.4+4
 
   # Firebase stuff
-  firebase_core: ^0.4.2
-  firebase_admob: ^0.9.3
-  in_app_purchase: 0.3.4+5
+  # firebase_core: ^0.4.2
+  # firebase_admob: ^0.9.3
+  # in_app_purchase: 0.3.4+5
 
   csv: 4.0.3
   url_launcher: ^5.6.0

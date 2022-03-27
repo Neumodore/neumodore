@@ -15,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'infra/translation.dart';
 
 void main() async {
-  // Initialize database
+
   WidgetsFlutterBinding.ensureInitialized();
 
   Get.put<SharedPreferences>(
