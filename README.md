@@ -1,7 +1,19 @@
+
+> **Warning** </br>
+> This repo will no longer be maintained !! </br>
+> The whole project has been stopped due not enough free time to fix bugs and on.
+
+
+<div align="center">
+
 # Neumodore
 
-![CI/CD](https://github.com/Neumodore/neumodore/workflows/CI/CD/badge.svg)
-[Playstore](https://play.google.com/store/apps/details?id=dev.vinicios.neumodore)
+![image](https://user-images.githubusercontent.com/10997022/229225903-5fa40332-752d-45a8-b8f8-bdbfc18d34ce.png)
+
+
+[![image](https://user-images.githubusercontent.com/10997022/229225098-6bbcae40-9fda-4bbd-bd6a-25377b743439.png)](https://play.google.com/store/apps/details?id=dev.vinicios.neumodore)
+</div>
+
 
 # Deploying new release
 
